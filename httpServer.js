@@ -11,6 +11,8 @@ const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
 const backendRouter = require('./routes/backend');
 const backendCountryRouter = require('./routes/backend/country');
+const backendBrandRouter = require('./routes/backend/brand');
+const backendCategoryRouter = require('./routes/backend/category');
 
 const app = express();
 
@@ -64,6 +66,8 @@ app.use('/users', usersRouter);
 // Backend routes prefix
 app.use('/backend', backendRouter);
 app.use('/backend/country', backendCountryRouter);
+app.use('/backend/brand', backendBrandRouter);
+app.use('/backend/category', backendCategoryRouter);
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {

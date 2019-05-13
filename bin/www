@@ -7,6 +7,8 @@ const { logger } = require('logger');
 const dbRunner = require('./runners/db');
 const webRunner = require('./runners/web');
 const seederCountryRunner = require('./runners/seeders/country');
+const seederBrandRunner = require('./runners/seeders/brand');
+const seederCategoryRunner = require('./runners/seeders/category');
 const seederUserRunner = require('./runners/seeders/user');
 const googlePlacesRunner = require('./runners/google');
 
@@ -16,6 +18,8 @@ Promise.resolve()
   .then(dbRunner)
   .then(webRunner)
   .then(seederCountryRunner)
+  .then(seederBrandRunner)
+  .then(seederCategoryRunner)
   .then(seederUserRunner)
   .then(googlePlacesRunner)
   .then(() => {

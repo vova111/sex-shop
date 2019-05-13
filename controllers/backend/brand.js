@@ -1,5 +1,5 @@
-const Country = require('models/country');
-const CountryJsonSchema = require('schemes/country');
+const Brand = require('models/brand');
+const BrandJsonSchema = require('schemes/brand');
 const Ajv = require('ajv/lib/ajv');
 const pagination = require('classes/boostrapPaginator');
 const queryStringBuilder = require('classes/queryStringBuilder');
@@ -8,20 +8,20 @@ const indexView = async (req, res, next) => {
     const page = typeof req.query.page === 'undefined' ? 1 : Number(req.query.page);
     const sort = {_id: 'DESC'};
 
-    const whereCountry = typeof req.query.name === 'undefined'
+    const whereBrand = typeof req.query.name === 'undefined'
         ? {}
         : {'name': { '$regex': req.query.name, '$options': 'i' }};
 
-    const countries = await Country.paginate(whereCountry, {sort: sort, page: page});
+    const brands = await Brand.paginate(whereBrand, {sort: sort, page: page});
 
     const prelink = '/backend/country' + queryStringBuilder.buildString(req.url);
-    const paginator = pagination.create(prelink, countries.page, countries.limit, countries.total);
+    const paginator = pagination.create(prelink, brands.page, brands.limit, brands.total);
     const paginationData = paginator.getPaginationData();
 
-    res.render('backend/country/index', {
-        title: 'Список стран',
+    res.render('backend/brand/index', {
+        title: 'Список брендов',
         data: req.query,
-        countries: countries.data,
+        brands: brands.data,
         counter: paginationData.fromResult,
         paginator: paginator,
         paginationData: paginationData
@@ -32,30 +32,30 @@ const indexView = async (req, res, next) => {
 };
 
 const createView = (req, res, next) => {
-    res.render('backend/country/create', { title: 'Создать новую страну', data: {}, error: false });
+    res.render('backend/brand/create', { title: 'Создать новый бренд', data: {}, error: false });
 };
 
 const createAction = async (req, res, next) => {
     try {
         const ajv = new Ajv({verbose: true});
-        const validCountry = ajv.validate(CountryJsonSchema, req.body);
+        const validBrand = ajv.validate(BrandJsonSchema, req.body);
 
-        if (!validCountry) {
+        if (!validBrand) {
             const message = `${ajv.errors[0].parentSchema.description} ${ajv.errors[0].message}`;
             throw new Error(message);
         }
 
-        const country = new Country({
+        const brand = new Brand({
             name: req.body.name
         });
 
-        await country.save();
+        await brand.save();
 
-        req.flash('success', 'Новая страна была успешно добавлена.');
+        req.flash('success', 'Новый бренд был успешно добавлен.');
 
-        res.redirect('/backend/country');
+        res.redirect('/backend/brand');
     } catch (error) {
-        res.render('backend/country/create', { title: 'Создать новую страну', data: req.body, error: error.message });
+        res.render('backend/brand/create', { title: 'Создать новый бренд', data: req.body, error: error.message });
     }
 };
 
@@ -63,11 +63,11 @@ const editView = async (req, res, next) => {
     const id = req.params.id;
 
     try {
-        const country = await Country.findById(id);
+        const brand = await Brand.findById(id);
 
-        res.render('backend/country/edit', { title: 'Редактирование страны', data: country, error: false });
+        res.render('backend/brand/edit', { title: 'Редактирование бренда', data: brand, error: false });
     } catch (error) {
-      next();
+        next();
     }
 };
 
@@ -76,23 +76,23 @@ const editAction = async (req, res, next) => {
 
     try {
         const ajv = new Ajv({verbose: true});
-        const validCountry = ajv.validate(CountryJsonSchema, req.body);
+        const validBrand = ajv.validate(BrandJsonSchema, req.body);
 
-        if (!validCountry) {
+        if (!validBrand) {
             const message = `${ajv.errors[0].parentSchema.description} ${ajv.errors[0].message}`;
             throw new Error(message);
         }
 
-        const country = await Country.findById(id);
+        const brand = await Brand.findById(id);
 
-        country.name = req.body.name;
-        await country.save();
+        brand.name = req.body.name;
+        await brand.save();
 
-        req.flash('success', 'Страна была успешно отредактирована.');
+        req.flash('success', 'Бренд был успешно отредактирован.');
 
-        res.redirect('/backend/country');
+        res.redirect('/backend/brand');
     } catch (error) {
-        res.render('backend/country/create', { title: 'Редактирование страны', data: req.body, error: error.message });
+        res.render('backend/brand/create', { title: 'Редактирование бренда', data: req.body, error: error.message });
     }
 };
 
@@ -100,12 +100,12 @@ const deleteAction = async (req, res, next) => {
     const id = req.params.id;
 
     try {
-        const country = await Country.findById(id);
-        country.delete();
+        const brand = await Brand.findById(id);
+        brand.delete();
 
-        req.flash('success', 'Страна была успешно удалена.');
+        req.flash('success', 'Бренд был успешно удален.');
 
-        res.redirect('/backend/country');
+        res.redirect('/backend/brand');
     } catch (error) {
         next();
     }

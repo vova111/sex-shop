@@ -10,4 +10,6 @@ router.post('/create', countryController.createAction);
 router.get('/edit/:id', countryController.editView);
 router.post('/edit/:id', countryController.editAction);
 
+router.post('/:id', countryController.deleteAction);
+
 module.exports = router;

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" type="text/css" href="/backend/stylesheets/bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="/backend/stylesheets/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="/backend/stylesheets/local.css" />
+</head>
+<body>
+<div id="wrapper">
+    <%- include('../nav'); -%>
+    <div id="page-wrapper">
+        <div class="row">
+            <div class="col-lg-12">
+                <ul class="breadcrumb">
+                    <li><a href="/home">Главная</a></li>
+                    <li><a href="/backend/category">Список категорий</a></li>
+                    <li class="active">Создать новую категорию</li>
+                </ul>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12">
+                <h1 class="page-header">Создать новую категорию</h1>
+            </div>
+        </div>
+        <% if (error) { %>
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="alert alert-danger">
+                        <strong>Ошибка!</strong> <%= error %>
+                    </div>
+                </div>
+            </div>
+        <% } %>
+        <div class="row">
+            <div class="col-lg-6">
+                <form action="" method="post" role="form">
+                    <div class="form-group">
+                        <label>Название категории: <span class="text-danger">*</span></label>
+                        <input class="form-control" type="text" name="name" value="<%= data.name %>" maxlength="40" placeholder="Название категории">
+                        <p class="help-block">Введите название категории здесь. ( Это поле обязательное. )</p>
+                    </div>
+                    <div class="form-group">
+                        <label>Родительская категория: </label>
+                        <select class="form-control" name="categoryId">
+                            <option value="">Сделать основной категорией</option>
+                            <% categories.forEach(function(category) { %>
+                                <% if (data.categoryId === category.id) { %>
+                                    <option value="<%= category.id %>" selected><%= category.name %></option>
+                                <% } else { %>
+                                    <option value="<%= category.id %>"><%= category.name %></option>
+                                <% } %>
+                            <% }); %>
+                        </select>
+                        <p class="help-block">Выберите родительскую категорию для новой категории.</p>
+                    </div>
+                    <div class="form-group">
+                        <label>Постоянная ссылка: <span class="text-danger">*</span></label>
+                        <input class="form-control" type="text" name="slug" value="<%= data.slug %>" maxlength="40" placeholder="Постоянная ссылка">
+                        <p class="help-block">Укажите постоянную ссылку по которой будет доступна категория. ( Это поле обязательное. )</p>
+                    </div>
+                    <div class="form-group">
+                        <label>Сортировка: <span class="text-danger">*</span></label>
+                        <input class="form-control" type="text" name="sort" value="<%= data.sort %>" maxlength="5" placeholder="Сортировка">
+                        <p class="help-block">Укажите число от 0 до 99999, по этому значению будут сотрироваться категории на сайте. ( Это поле обязательное. )</p>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary">Создать</button>
+                        <a href="/backend/category" class="btn btn-default">Отмена</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/backend/javascripts/menu.js"></script>
+</body>
+</html>

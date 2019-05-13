@@ -72,6 +72,10 @@ body {
     float: right;
 }
 
+.breadcrumb {
+    margin-bottom: 0;
+}
+
 /* Nav Messages */
 .messages-dropdown .dropdown-menu .message-preview .avatar,
 .messages-dropdown .dropdown-menu .message-preview .name,
