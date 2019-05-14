@@ -55,6 +55,10 @@ const createAction = async (req, res, next) => {
 
         res.redirect('/backend/country');
     } catch (error) {
+        if (error.code === 11000) {
+            error.message = 'Страна с таким названием уже существует.';
+        }
+
         res.render('backend/country/create', { title: 'Создать новую страну', data: req.body, error: error.message });
     }
 };
@@ -92,6 +96,10 @@ const editAction = async (req, res, next) => {
 
         res.redirect('/backend/country');
     } catch (error) {
+        if (error.code === 11000) {
+            error.message = 'Страна с таким названием уже существует.';
+        }
+
         res.render('backend/country/create', { title: 'Редактирование страны', data: req.body, error: error.message });
     }
 };
@@ -101,7 +109,7 @@ const deleteAction = async (req, res, next) => {
 
     try {
         const country = await Country.findById(id);
-        country.delete();
+        await country.delete();
 
         req.flash('success', 'Страна была успешно удалена.');
 

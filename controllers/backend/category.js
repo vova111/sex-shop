@@ -3,6 +3,7 @@ const CategoryJsonSchema = require('schemes/category');
 const Ajv = require('ajv/lib/ajv');
 const pagination = require('classes/boostrapPaginator');
 const queryStringBuilder = require('classes/queryStringBuilder');
+const slugify = require('@sindresorhus/slugify');
 
 const indexView = async (req, res, next) => {
     const page = typeof req.query.page === 'undefined' ? 1 : Number(req.query.page);
@@ -71,6 +72,10 @@ const createAction = async (req, res, next) => {
 
         res.redirect('/backend/category');
     } catch (error) {
+        if (error.code === 11000) {
+            error.message = 'Категория с такой постоянной ссылкой уже существует.';
+        }
+
         const categories = await Category.find({parent: null}).sort({sort: 1});
         res.render('backend/category/create', { title: 'Создать новую категорию', data: req.body, categories: categories, error: error.message });
     }
@@ -81,7 +86,7 @@ const editView = async (req, res, next) => {
 
     try {
         const category = await Category.findById(id);
-        const categories = await Category.find({parent: null}).sort({sort: 1});
+        const categories = await Category.find({parent: null, _id: {$ne: id}}).sort({sort: 1});
 
         res.render('backend/category/edit', { title: 'Редактирование категории', data: category, categories: categories, error: false });
     } catch (error) {
@@ -91,26 +96,37 @@ const editView = async (req, res, next) => {
 
 const editAction = async (req, res, next) => {
     const id = req.params.id;
+    const { name, categoryId, slug, sort } = req.body;
+    const categoryObj = { name, categoryId, slug, sort: Number(sort) };
 
     try {
         const ajv = new Ajv({verbose: true});
-        const validBrand = ajv.validate(CategoryJsonSchema, req.body);
+        const validCategory = ajv.validate(CategoryJsonSchema, categoryObj);
 
-        if (!validBrand) {
+        if (!validCategory) {
             const message = `${ajv.errors[0].parentSchema.description} ${ajv.errors[0].message}`;
             throw new Error(message);
         }
 
-        const brand = await Category.findById(id);
+        const category = await Category.findById(id);
 
-        brand.name = req.body.name;
-        await brand.save();
+        category.name = name;
+        category.parent = !categoryId.length ? null : categoryId;
+        category.sort = sort;
+        category.slug = slug;
 
-        req.flash('success', 'Бренд был успешно отредактирован.');
+        await category.save();
 
-        res.redirect('/backend/brand');
+        req.flash('success', 'Категория был успешно отредактирована.');
+
+        res.redirect('/backend/category');
     } catch (error) {
-        res.render('backend/brand/create', { title: 'Редактирование бренда', data: req.body, error: error.message });
+        if (error.code === 11000) {
+            error.message = 'Категория с такой постоянной ссылкой уже существует.';
+        }
+
+        const categories = await Category.find({parent: null, _id: {$ne: id}}).sort({sort: 1});
+        res.render('backend/category/edit', { title: 'Редактирование категории', data: req.body, categories: categories, error: error.message });
     }
 };
 
@@ -118,14 +134,29 @@ const deleteAction = async (req, res, next) => {
     const id = req.params.id;
 
     try {
-        const brand = await Category.findById(id);
-        brand.delete();
+        const category = await Category.findById(id);
+        await category.delete();
 
-        req.flash('success', 'Бренд был успешно удален.');
+        req.flash('success', 'Категория была успешно удалена.');
 
-        res.redirect('/backend/brand');
+        res.redirect('/backend/category');
     } catch (error) {
         next();
+    }
+};
+
+const getSlug = (req, res, next) => {
+    res.json({status: true, slug: slugify(req.body.name).substring(0, 40)});
+};
+
+const canDelete = async (req, res, next) => {
+    try {
+        const count = await Category.countDocuments({parent: req.body.id});
+        const message = !count ? '' : 'Вы не можете удалить эту категорию, так как она содержит вложенные подкатегории!';
+
+        res.json({status: true, count: count, message: message});
+    } catch (error) {
+        res.json({status: false});
     }
 };
 
@@ -135,3 +166,5 @@ module.exports.createAction = createAction;
 module.exports.editView = editView;
 module.exports.editAction = editAction;
 module.exports.deleteAction = deleteAction;
+module.exports.getSlug = getSlug;
+module.exports.canDelete = canDelete;

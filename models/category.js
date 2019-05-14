@@ -5,7 +5,7 @@ const Schema = mongoose.Schema;
 
 const categorySchema = new Schema({
     name: {
-        type: String,
+        type: Schema.Types.String,
         required: true,
         trim: true
     },
@@ -16,16 +16,17 @@ const categorySchema = new Schema({
         default: null
     },
     sort: {
-        type: Number,
+        type: Schema.Types.Number,
         default: 0
     },
     slug: {
-        type: String,
+        type: Schema.Types.String,
         required: true,
+        trim: true,
         unique: true
     },
     productsCount: {
-        type: Number,
+        type: Schema.Types.Number,
         default: 0
     }
 });
@@ -35,7 +36,7 @@ categorySchema.plugin(mongoosePaginator, {
 });
 
 categorySchema.virtual('categoryId').get(function () {
-    return this.parent ? this.parent.id : null;
+    return !this.parent ? null : this.parent.toString();
 });
 
 const Category = mongoose.model('Category', categorySchema);

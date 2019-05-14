@@ -26,18 +26,20 @@
                 <h1 class="page-header">Редактирование страны</h1>
             </div>
         </div>
-        <% if (error) { %>
-            <div class="row">
-                <div class="col-lg-6">
-                    <div class="alert alert-danger">
-                        <strong>Ошибка!</strong> <%= error %>
+        <div class="error-container">
+            <% if (error) { %>
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="alert alert-danger">
+                            <strong>Ошибка!</strong> <%= error %>
+                        </div>
                     </div>
                 </div>
-            </div>
-        <% } %>
+            <% } %>
+        </div>
         <div class="row">
-            <div class="col-lg-6">
-                <form action="/backend/country/edit/<%= data.id %>" method="post" role="form">
+            <div class="col-lg-12">
+                <form action="/backend/country/edit/<%= data.id %>" method="post" role="form" name="country">
                     <div class="form-group">
                         <label>Название страны: <span class="text-danger">*</span></label>
                         <input class="form-control" type="text" name="name" value="<%= data.name %>" maxlength="40" placeholder="Название страны">
@@ -53,5 +55,8 @@
     </div>
 </div>
 <script src="/backend/javascripts/menu.js"></script>
+<script src="/backend/javascripts/errors.js"></script>
+<script src="/plugins/validator/validate.min.js"></script>
+<script src="/backend/javascripts/pages/country/form.js"></script>
 </body>
 </html>

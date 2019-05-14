@@ -76,6 +76,11 @@ body {
     margin-bottom: 0;
 }
 
+.errors-list {
+    list-style: none;
+    padding: 0;
+}
+
 /* Nav Messages */
 .messages-dropdown .dropdown-menu .message-preview .avatar,
 .messages-dropdown .dropdown-menu .message-preview .name,

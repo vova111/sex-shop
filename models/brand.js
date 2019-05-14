@@ -5,8 +5,10 @@ const Schema = mongoose.Schema;
 
 const brandSchema = new Schema({
     name: {
-        type: String,
-        required: true
+        type: Schema.Types.String,
+        required: true,
+        trim: true,
+        unique: true
     }
 });
 

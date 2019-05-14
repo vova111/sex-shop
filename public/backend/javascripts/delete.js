@@ -16,6 +16,17 @@ const createDeleteForm = () => {
     body.appendChild(form);
 };
 
+const submitDelteForm = (form, id, url) => {
+    alertify.confirm('Подтверждение', 'Вы действительно хотите удалить этот элемент?', () => {
+        const action = `/backend/${url}/${id}`;
+
+        form.setAttribute('action', action);
+        form.submit();
+    }, () => {
+        return;
+    });
+};
+
 document.addEventListener('DOMContentLoaded', () => {
     createDeleteForm();
 
@@ -28,15 +39,29 @@ document.addEventListener('DOMContentLoaded', () => {
         if (target.classList.contains('delete')) {
             const id = target.dataset.item;
             const url = target.dataset.url;
+            const check = target.dataset.check;
 
-            alertify.confirm('Подтверждение', 'Вы действительно хотите удалить этот элемент?', () => {
-                const action = `/backend/${url}/${id}`;
+            if (!check) {
+                submitDelteForm(form, id, url);
+            } else {
+                axios.post(`/backend/${url}/${check}`, {
+                        id: id
+                    })
+                    .then((response) => {
+                        if (response.data.status) {
+                            const count = Number(response.data.count);
 
-                form.setAttribute('action', action);
-                form.submit();
-            }, () => {
-                return;
-            });
+                            if (!count) {
+                                submitDelteForm(form, id, url);
+                            } else {
+                                alertify.alert('Внимание!', response.data.message);
+                            }
+                        }
+                    })
+                    .catch((error) => {
+                        //
+                    });
+            }
         }
     });
 });

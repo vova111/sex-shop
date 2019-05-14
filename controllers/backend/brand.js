@@ -55,6 +55,10 @@ const createAction = async (req, res, next) => {
 
         res.redirect('/backend/brand');
     } catch (error) {
+        if (error.code === 11000) {
+            error.message = 'Бренд с таким названием уже существует.';
+        }
+
         res.render('backend/brand/create', { title: 'Создать новый бренд', data: req.body, error: error.message });
     }
 };
@@ -92,6 +96,10 @@ const editAction = async (req, res, next) => {
 
         res.redirect('/backend/brand');
     } catch (error) {
+        if (error.code === 11000) {
+            error.message = 'Бренд с таким названием уже существует.';
+        }
+
         res.render('backend/brand/create', { title: 'Редактирование бренда', data: req.body, error: error.message });
     }
 };
@@ -101,7 +109,7 @@ const deleteAction = async (req, res, next) => {
 
     try {
         const brand = await Brand.findById(id);
-        brand.delete();
+        await brand.delete();
 
         req.flash('success', 'Бренд был успешно удален.');
 

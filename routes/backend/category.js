@@ -12,4 +12,7 @@ router.post('/edit/:id', categoryController.editAction);
 
 router.post('/:id', categoryController.deleteAction);
 
+router.post('/slug', categoryController.getSlug);
+router.post('/remove', categoryController.canDelete);
+
 module.exports = router;

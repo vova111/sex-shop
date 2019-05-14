@@ -5,8 +5,9 @@ const Schema = mongoose.Schema;
 
 const countrySchema = new Schema({
     name: {
-        type: String,
+        type: Schema.Types.String,
         required: true,
+        trim: true,
         unique: true
     }
 });
