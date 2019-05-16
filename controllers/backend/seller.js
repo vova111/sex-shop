@@ -4,6 +4,8 @@ const Ajv = require('ajv/lib/ajv');
 const pagination = require('classes/boostrapPaginator');
 const queryStringBuilder = require('classes/queryStringBuilder');
 const slugify = require('@sindresorhus/slugify');
+const sellerImgPath = require('config').get('path:sellers:logo');
+const fs = require('fs-extra');
 
 const indexView = async (req, res, next) => {
     const page = typeof req.query.page === 'undefined' ? 1 : Number(req.query.page);
@@ -37,7 +39,7 @@ const createView = async (req, res, next) => {
 };
 
 const createAction = async (req, res, next) => {
-    const { name, slug } = req.body;
+    const { name, slug, logo } = req.body;
 
     try {
         const ajv = new Ajv({verbose: true});
@@ -53,6 +55,12 @@ const createAction = async (req, res, next) => {
             slug: slug
         });
 
+        if (logo) {
+            const filename = `${slug}.jpg`;
+            await fs.outputFile(`${sellerImgPath}${filename}`, logo, 'base64');
+            seller.logo = filename;
+        }
+
         await seller.save();
 
         req.flash('success', 'Новый продавец был успешно добавлен.');
@@ -60,7 +68,7 @@ const createAction = async (req, res, next) => {
         res.redirect('/backend/seller');
     } catch (error) {
         if (error.code === 11000) {
-            error.message = 'Категория с такой постоянной ссылкой уже существует.';
+            error.message = 'Продавец с такой постоянной ссылкой уже существует.';
         }
 
         res.render('backend/seller/create', { title: 'Создать нового продавца', data: req.body, error: error.message });
@@ -81,7 +89,7 @@ const editView = async (req, res, next) => {
 
 const editAction = async (req, res, next) => {
     const id = req.params.id;
-    const { name, slug } = req.body;
+    const { name, slug, logo } = req.body;
 
     try {
         const ajv = new Ajv({verbose: true});
@@ -96,6 +104,13 @@ const editAction = async (req, res, next) => {
 
         seller.name = name;
         seller.slug = slug;
+
+        // slug не подходит
+        if (logo) {
+            const filename = `${slug}.jpg`;
+            await fs.outputFile(`${sellerImgPath}${filename}`, logo, 'base64');
+            seller.logo = filename;
+        }
 
         await seller.save();
 

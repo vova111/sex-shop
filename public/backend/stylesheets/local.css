@@ -140,6 +140,18 @@ body {
     width: 2rem;
 }
 
+.cropper-box, .cropper-input {
+    display: none;
+}
+
+.uploaded-seller-logo {
+    margin-bottom: 30px;
+}
+
+.hidden-uploaded {
+    display: none;
+}
+
 /* Nav Messages */
 .messages-dropdown .dropdown-menu .message-preview .avatar,
 .messages-dropdown .dropdown-menu .message-preview .name,

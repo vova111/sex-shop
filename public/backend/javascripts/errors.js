@@ -34,6 +34,12 @@ const showFormErrors = (errors, cropFirstWord = true) => {
     divRow.appendChild(divCol);
 
     container.appendChild(divRow);
+
+    window.scroll({
+        top: 0,
+        left: 0,
+        behavior: 'smooth'
+    });
 };
 
 const hideFromErrors = () => {
