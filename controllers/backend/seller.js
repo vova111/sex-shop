@@ -56,7 +56,7 @@ const createAction = async (req, res, next) => {
         });
 
         if (logo) {
-            const filename = `${slug}.jpg`;
+            const filename = Seller.getUniqueFilename();
             await fs.outputFile(`${sellerImgPath}${filename}`, logo, 'base64');
             seller.logo = filename;
         }
@@ -105,9 +105,8 @@ const editAction = async (req, res, next) => {
         seller.name = name;
         seller.slug = slug;
 
-        // slug не подходит
         if (logo) {
-            const filename = `${slug}.jpg`;
+            const filename = Seller.getUniqueFilename();
             await fs.outputFile(`${sellerImgPath}${filename}`, logo, 'base64');
             seller.logo = filename;
         }
@@ -119,7 +118,7 @@ const editAction = async (req, res, next) => {
         res.redirect('/backend/seller');
     } catch (error) {
         if (error.code === 11000) {
-            error.message = 'Категория с такой постоянной ссылкой уже существует.';
+            error.message = 'Продавец с такой постоянной ссылкой уже существует.';
         }
 
         res.render('backend/seller/edit', { title: 'Редактирование продавца', data: req.body, error: error.message });
@@ -146,14 +145,16 @@ const getSlug = (req, res, next) => {
 };
 
 const canDelete = async (req, res, next) => {
-    // try {
-    //     const count = await Seller.countDocuments({parent: req.body.id});
-    //     const message = !count ? '' : 'Вы не можете удалить эту категорию, так как она содержит вложенные подкатегории!';
-    //
-    //     res.json({status: true, count: count, message: message});
-    // } catch (error) {
-    //     res.json({status: false});
-    // }
+    try {
+        // const count = await Seller.countDocuments({parent: req.body.id});
+        // Здесь нужно проверять сколько у продавца товара когда будет готова модель Товаров
+        const count = 0;
+        const message = !count ? '' : 'Вы не можете удалить этого продавца, так как у него имеются товары!';
+
+        res.json({status: true, count: count, message: message});
+    } catch (error) {
+        res.json({status: false});
+    }
 };
 
 module.exports.indexView = indexView;

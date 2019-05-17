@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const mongoosePaginator = require('mongoose-paginator-simple');
+const fs = require('fs-extra');
 const sellerImgPath = require('config').get('path:sellers:logo');
 const sellerImgUrl = require('config').get('path:sellers:url');
 
@@ -36,9 +37,23 @@ sellerSchema.virtual('logoUrl').get(function () {
     return this.logo ? `${sellerImgUrl}${this.logo}` : null;
 });
 
-sellerSchema.pre('save', function (next) {
+sellerSchema.statics.getUniqueFilename = function() {
+    return `${mongoose.Types.ObjectId()}.jpg`;
+};
+
+sellerSchema.pre('save', async function (next) {
     if (this.isModified('logo')) {
-        console.log('change');
+        if (this._previousLogo) {
+            await fs.remove(`${sellerImgPath}${this._previousLogo}`);
+        }
+    }
+
+    next();
+});
+
+sellerSchema.pre('remove', async function (next) {
+    if (this.logo) {
+        await fs.remove(`${sellerImgPath}${this.logo}`);
     }
 
     next();
