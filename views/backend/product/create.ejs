@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" type="text/css" href="/backend/stylesheets/bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="/backend/stylesheets/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="/plugins/slimselect/slimselect.min.css" />
+    <link rel="stylesheet" type="text/css" href="/backend/stylesheets/local.css" />
+</head>
+<body>
+<div id="wrapper">
+    <%- include('../nav'); -%>
+    <div id="page-wrapper">
+        <div class="row">
+            <div class="col-lg-12">
+                <ul class="breadcrumb">
+                    <li><a href="/home">Главная</a></li>
+                    <li><a href="/backend/product">Список товаров</a></li>
+                    <li class="active">Создать новый товар</li>
+                </ul>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12">
+                <h1 class="page-header">Создать новый товар</h1>
+            </div>
+        </div>
+        <div class="error-container">
+            <% if (error) { %>
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="alert alert-danger">
+                            <strong>Ошибка!</strong> <%= error %>
+                        </div>
+                    </div>
+                </div>
+            <% } %>
+        </div>
+        <div class="row">
+            <div class="col-lg-12">
+                <form action="" method="post" role="form" name="product" enctype="multipart/form-data">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label>Название товара: <span class="text-danger">*</span></label>
+                                <input class="form-control" type="text" name="name" value="<%= data.name %>" maxlength="200" placeholder="Название товара">
+                                <p class="help-block">Введите название товара здесь. ( Это поле обязательное. )</p>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label>Код товара: <span class="text-danger">*</span></label>
+                                <input class="form-control" type="text" name="code" value="<%= data.code %>" maxlength="8" placeholder="Код товара">
+                                <p class="help-block">Введите код товара здесь. ( Это поле обязательное. )</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label>Цена: <span class="text-danger">*</span></label>
+                                <input class="form-control" type="text" name="cost" value="<%= data.cost %>" maxlength="8" placeholder="Цена">
+                                <p class="help-block">Укажите цену товара здесь. ( Это поле обязательное. )</p>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label>Скидочная цена:</label>
+                                <input class="form-control" type="text" name="discount" value="<%= data.discount %>" maxlength="8" placeholder="Скидочная цена">
+                                <p class="help-block">Укажите цену товара со скидкой здесь.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <div class="form-group">
+                                    <label>Категория товара: <span class="text-danger">*</span></label>
+                                    <select name="category" multiple>
+                                        <optgroup label="Label 1">
+                                            <option value="value 1">Value 1</option>
+                                            <option value="value 2" selected>Value 2</option>
+                                            <option value="value 3">Value 3</option>
+                                        </optgroup>
+                                        <optgroup label="Label 2">
+                                            <option value="value 21">Value 1</option>
+                                            <option value="value 22">Value 2</option>
+                                            <option value="value 23" selected>Value 3</option>
+                                        </optgroup>
+                                    </select>
+                                    <p class="help-block">Выберите одну или более категорий для товара. ( Это поле обязательное. )</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label>Продавец: </label>
+                                <select name="seller">
+                                    <option value="">отсутствует</option>
+                                </select>
+                                <p class="help-block">Выберите продавца товара.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <div class="form-group">
+                                    <label>Бренд: </label>
+                                    <select name="brand">
+                                        <option value="">отсутствует</option>
+                                        <% brands.forEach(function(brand) { %>
+                                            <% if (data.brand === brand.id) { %>
+                                                <option value="<%= brand.id %>" selected><%= brand.name %></option>
+                                            <% } else { %>
+                                                <option value="<%= brand.id %>"><%= brand.name %></option>
+                                            <% } %>
+                                        <% }); %>
+                                    </select>
+                                    <p class="help-block">Выберите страну в которой был произведен товар.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label>Страна производитель: </label>
+                                <select name="country">
+                                    <option value="">отсутствует</option>
+                                    <% countries.forEach(function(country) { %>
+                                        <% if (data.country === country.id) { %>
+                                            <option value="<%= country.id %>" selected><%= country.name %></option>
+                                        <% } else { %>
+                                            <option value="<%= country.id %>"><%= country.name %></option>
+                                        <% } %>
+                                    <% }); %>
+                                </select>
+                                <p class="help-block">Выберите страну в которой был произведен товар.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label>Постоянная ссылка: <span class="text-danger">*</span></label>
+                                <input class="form-control" type="text" name="slug" value="<%= data.slug %>" maxlength="200" placeholder="Постоянная ссылка">
+                                <p class="help-block">Укажите постоянную ссылку по которой будет доступен товар. ( Это поле обязательное. )</p>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label>В наличии</label>
+                                <div class="checkbox">
+                                    <label>
+                                        <input type="checkbox" checked> Этот товар есть на складе
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <h3 class="page-header">Описание товара</h3>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label>Краткое описание товара:</label>
+                                <textarea class="form-control" name="short" rows="6" placeholder="Краткое описание товара"><%= data.short %></textarea>
+                                <p class="help-block">Напишите краткое описание товара, пару предложений.</p>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label>Полное описание товара:</label>
+                                <textarea class="form-control" name="full" rows="6" placeholder="Полное описание товара"><%= data.full %></textarea>
+                                <p class="help-block">Напишите полное описание товара.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary">Создать</button>
+                        <a href="/backend/product" class="btn btn-default">Отмена</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/backend/javascripts/menu.js"></script>
+<script src="/backend/javascripts/errors.js"></script>
+<script src="/plugins/axios/axios.min.js"></script>
+<script src="/plugins/validator/validate.min.js"></script>
+<script src="/plugins/slimselect/slimselect.min.js"></script>
+<script src="/backend/javascripts/pages/product/form.js"></script>
+</body>
+</html>

@@ -16,5 +16,6 @@ router.post('/:id', sellerController.deleteAction);
 
 router.post('/slug', sellerController.getSlug);
 router.post('/remove', sellerController.canDelete);
+router.post('/search', sellerController.ajaxSearch);
 
 module.exports = router;

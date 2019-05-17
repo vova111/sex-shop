@@ -1,4 +1,7 @@
-const Seller = require('models/seller');
+const Product = require('models/product');
+const Country = require('models/country');
+const Brand = require('models/brand');
+const Category = require('models/category');
 const SellerJsonSchema = require('schemes/seller');
 const Ajv = require('ajv/lib/ajv');
 const pagination = require('classes/boostrapPaginator');
@@ -8,14 +11,14 @@ const sellerImgPath = require('config').get('path:sellers:logo');
 const fs = require('fs-extra');
 
 const indexView = async (req, res, next) => {
-    const page = typeof req.query.page === 'undefined' ? 1 : Number(req.query.page);
+    /*const page = typeof req.query.page === 'undefined' ? 1 : Number(req.query.page);
     const sort = {_id: 'DESC'};
 
     const whereSeller = typeof req.query.name === 'undefined'
         ? {}
         : {'name': { '$regex': req.query.name, '$options': 'i' }};
 
-    const sellers = await Seller.paginate(whereSeller, {sort: sort, page: page});
+    const sellers = await Product.paginate(whereSeller, {sort: sort, page: page});
 
     const prelink = '/backend/seller' + queryStringBuilder.buildString(req.url);
     const paginator = pagination.create(prelink, sellers.page, sellers.limit, sellers.total);
@@ -31,15 +34,25 @@ const indexView = async (req, res, next) => {
     }, (err, html) => {
         req.session.flash = [];
         res.send(html);
-    });
+    });*/
 };
 
 const createView = async (req, res, next) => {
-    res.render('backend/seller/create', { title: 'Создать нового продавца', data: {}, error: false });
+    const countries = await Country.find({}).sort({name: 1});
+    const brands = await Brand.find({}).sort({name: 1});
+    const categories = await Category.getTreeForMultiSelect();
+
+    res.render('backend/product/create', {
+        title: 'Создать новый товар',
+        data: {},
+        countries: countries,
+        brands: brands,
+        error: false
+    });
 };
 
 const createAction = async (req, res, next) => {
-    const { name, slug, logo } = req.body;
+    /*const { name, slug, logo } = req.body;
 
     try {
         const ajv = new Ajv({verbose: true});
@@ -50,13 +63,13 @@ const createAction = async (req, res, next) => {
             throw new Error(message);
         }
 
-        const seller = new Seller({
+        const seller = new Product({
             name: name,
             slug: slug
         });
 
         if (logo) {
-            const filename = Seller.getUniqueFilename();
+            const filename = Product.getUniqueFilename();
             await fs.outputFile(`${sellerImgPath}${filename}`, logo, 'base64');
             seller.logo = filename;
         }
@@ -72,23 +85,23 @@ const createAction = async (req, res, next) => {
         }
 
         res.render('backend/seller/create', { title: 'Создать нового продавца', data: req.body, error: error.message });
-    }
+    }*/
 };
 
 const editView = async (req, res, next) => {
-    const id = req.params.id;
+    /*const id = req.params.id;
 
     try {
-        const seller = await Seller.findById(id);
+        const seller = await Product.findById(id);
 
         res.render('backend/seller/edit', { title: 'Редактирование продавца', data: seller, error: false });
     } catch (error) {
         next();
-    }
+    }*/
 };
 
 const editAction = async (req, res, next) => {
-    const id = req.params.id;
+    /*const id = req.params.id;
     const { name, slug, logo } = req.body;
 
     try {
@@ -100,13 +113,13 @@ const editAction = async (req, res, next) => {
             throw new Error(message);
         }
 
-        const seller = await Seller.findById(id);
+        const seller = await Product.findById(id);
 
         seller.name = name;
         seller.slug = slug;
 
         if (logo) {
-            const filename = Seller.getUniqueFilename();
+            const filename = Product.getUniqueFilename();
             await fs.outputFile(`${sellerImgPath}${filename}`, logo, 'base64');
             seller.logo = filename;
         }
@@ -122,14 +135,14 @@ const editAction = async (req, res, next) => {
         }
 
         res.render('backend/seller/edit', { title: 'Редактирование продавца', data: req.body, error: error.message });
-    }
+    }*/
 };
 
 const deleteAction = async (req, res, next) => {
-    const id = req.params.id;
+    /*const id = req.params.id;
 
     try {
-        const seller = await Seller.findById(id);
+        const seller = await Product.findById(id);
         await seller.delete();
 
         req.flash('success', 'Продавец был успешно удален.');
@@ -137,7 +150,7 @@ const deleteAction = async (req, res, next) => {
         res.redirect('/backend/seller');
     } catch (error) {
         next();
-    }
+    }*/
 };
 
 const getSlug = (req, res, next) => {
@@ -145,8 +158,8 @@ const getSlug = (req, res, next) => {
 };
 
 const canDelete = async (req, res, next) => {
-    try {
-        // const count = await Seller.countDocuments({parent: req.body.id});
+    /*try {
+        // const count = await Product.countDocuments({parent: req.body.id});
         // Здесь нужно проверять сколько у продавца товара когда будет готова модель Товаров
         const count = 0;
         const message = !count ? '' : 'Вы не можете удалить этого продавца, так как у него имеются товары!';
@@ -154,14 +167,7 @@ const canDelete = async (req, res, next) => {
         res.json({status: true, count: count, message: message});
     } catch (error) {
         res.json({status: false});
-    }
-};
-
-const ajaxSearch = async (req, res, next) => {
-    const sellers = await Seller.find({'name': { '$regex': req.body.name, '$options': 'i' }}).select('id name').sort({name: 1});
-    const result = sellers ? {status: true, sellers} : {status: false};
-
-    res.json(result);
+    }*/
 };
 
 module.exports.indexView = indexView;
@@ -172,4 +178,3 @@ module.exports.editAction = editAction;
 module.exports.deleteAction = deleteAction;
 module.exports.getSlug = getSlug;
 module.exports.canDelete = canDelete;
-module.exports.ajaxSearch = ajaxSearch;
