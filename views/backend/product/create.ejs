@@ -6,6 +6,8 @@
     <title><%= title %></title>
     <link rel="stylesheet" type="text/css" href="/backend/stylesheets/bootstrap.min.css" />
     <link rel="stylesheet" type="text/css" href="/backend/stylesheets/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="/plugins/cropperjs/cropper.min.css" />
+    <link rel="stylesheet" type="text/css" href="/plugins/alertify/css/alertify.min.css" />
     <link rel="stylesheet" type="text/css" href="/plugins/slimselect/slimselect.min.css" />
     <link rel="stylesheet" type="text/css" href="/backend/stylesheets/local.css" />
 </head>
@@ -78,17 +80,8 @@
                             <div class="form-group">
                                 <div class="form-group">
                                     <label>Категория товара: <span class="text-danger">*</span></label>
-                                    <select name="category" multiple>
-                                        <optgroup label="Label 1">
-                                            <option value="value 1">Value 1</option>
-                                            <option value="value 2" selected>Value 2</option>
-                                            <option value="value 3">Value 3</option>
-                                        </optgroup>
-                                        <optgroup label="Label 2">
-                                            <option value="value 21">Value 1</option>
-                                            <option value="value 22">Value 2</option>
-                                            <option value="value 23" selected>Value 3</option>
-                                        </optgroup>
+                                    <select name="category[]" multiple>
+                                        <%- categories %>>
                                     </select>
                                     <p class="help-block">Выберите одну или более категорий для товара. ( Это поле обязательное. )</p>
                                 </div>
@@ -153,7 +146,7 @@
                                 <label>В наличии</label>
                                 <div class="checkbox">
                                     <label>
-                                        <input type="checkbox" checked> Этот товар есть на складе
+                                        <input type="checkbox" name="stock" checked> Этот товар есть на складе
                                     </label>
                                 </div>
                             </div>
@@ -176,6 +169,39 @@
                             </div>
                         </div>
                     </div>
+                    <h3 class="page-header">Характеристики</h3>
+                    <div class="product-specification-container"></div>
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <button type="button" class="btn btn-success btn-xs add-specification"><i class="fa fa-plus"></i> Добавить характеристику</button>
+                        </div>
+                    </div>
+                    <h3 class="page-header">Изображения</h3>
+                    <div class="product-images-container"></div>
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="form-group">
+                                <label>Добавить изображение:</label>
+                                <input class="form-control" type="file" name="img" accept="image/*">
+                                <p class="help-block">Загружите одно или более изображений.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row cropper-box">
+                        <div class="col-md-9">
+                            <div class="img-container">
+                                <img src="" alt="Picture">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="docs-preview clearfix">
+                                <div class="img-preview preview-lg"></div>
+                            </div>
+                            <div>
+                                <button type="button" class="btn btn-success save-product-image"><i class="fa fa-save"></i> Сохранить изображение</button>
+                            </div>
+                        </div>
+                    </div>
                     <div class="form-group">
                         <button type="submit" class="btn btn-primary">Создать</button>
                         <a href="/backend/product" class="btn btn-default">Отмена</a>
@@ -188,7 +214,11 @@
 <script src="/backend/javascripts/menu.js"></script>
 <script src="/backend/javascripts/errors.js"></script>
 <script src="/plugins/axios/axios.min.js"></script>
+<script src="/plugins/imask/imask.js"></script>
+<script src="/plugins/alertify/alertify.min.js"></script>
 <script src="/plugins/validator/validate.min.js"></script>
+<script src="/plugins/pica/pica.min.js"></script>
+<script src="/plugins/cropperjs/cropper.min.js"></script>
 <script src="/plugins/slimselect/slimselect.min.js"></script>
 <script src="/backend/javascripts/pages/product/form.js"></script>
 </body>

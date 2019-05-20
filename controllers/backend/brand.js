@@ -14,7 +14,7 @@ const indexView = async (req, res, next) => {
 
     const brands = await Brand.paginate(whereBrand, {sort: sort, page: page});
 
-    const prelink = '/backend/country' + queryStringBuilder.buildString(req.url);
+    const prelink = '/backend/brand' + queryStringBuilder.buildString(req.url);
     const paginator = pagination.create(prelink, brands.page, brands.limit, brands.total);
     const paginationData = paginator.getPaginationData();
 

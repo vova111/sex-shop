@@ -42,36 +42,35 @@ categorySchema.virtual('categoryId').get(function () {
 
 categorySchema.statics.getTreeForMultiSelect = async function (present = null) {
     const categories = await prepareTree();
-    console.log(categories);
+
+    const buildGroupSelect = (categories) => {
+        let selectHtml = '';
+
+        for (let category of categories) {
+            if (typeof(category.children) !== 'undefined' || category.parent === null) {
+                selectHtml += `<optgroup label="${category.name}">`;
+
+                if (typeof(category.children) !== 'undefined') {
+                    selectHtml += buildGroupSelect(category.children);
+                }
+
+                selectHtml += '</optgroup>';
+            } else {
+                selectHtml += `<option value="${category._id}">${category.name}</option>`;
+            }
+        }
+
+        return selectHtml;
+    };
+
+    return buildGroupSelect(categories);
 };
 
-const prepareTree = async () => {
-    const categories = await Category.find({}).sort({sort: -1});
+const prepareTree = async (fields = 'id name parent', where = {}) => {
+    const categories = await Category.find(where).select(fields).sort({sort: 1});
+    const json = JSON.stringify(categories);
 
-    var dataTwo = [
-        {
-            _id: 'ec654ec1-7f8f-11e3-ae96-b385f4bc450c',
-            name: 'Portfolio',
-            parent: null
-        },
-        {
-            _id: 'ec666030-7f8f-11e3-ae96-0123456789ab',
-            name: 'Web Development',
-            parent: 'ec654ec1-7f8f-11e3-ae96-b385f4bc450c'
-        },
-        {
-            _id: 'ec66fc70-7f8f-11e3-ae96-000000000000',
-            name: 'Recent Works',
-            parent: 'ec666030-7f8f-11e3-ae96-0123456789ab'
-        },
-        {
-            _id: '32a4fbed-676d-47f9-a321-cb2f267e2918',
-            name: 'About Me',
-            parent: null
-        }
-    ];
-
-    return arrayToTree(dataTwo, {
+    return arrayToTree(JSON.parse(json), {
         parentProperty: 'parent',
         customID: '_id'
     });

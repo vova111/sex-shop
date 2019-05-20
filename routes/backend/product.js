@@ -15,6 +15,7 @@ router.post('/edit/:id', upload.none(), productController.editAction);
 router.post('/:id', productController.deleteAction);
 
 router.post('/slug', productController.getSlug);
+router.post('/prevalidation', productController.prevalidation);
 router.post('/remove', productController.canDelete);
 
 module.exports = router;

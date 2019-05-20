@@ -9,7 +9,20 @@ const init = () => new Promise((resolve, reject) => {
                     {name: 'Alive'},
                     {name: 'Big Teaze Toys'},
                     {name: 'BKK'},
-                    {name: 'Blow Yo'}
+                    {name: 'Blow Yo'},
+                    {name: 'You2Toys'},
+                    {name: 'Baile'},
+                    {name: 'Seven Creations'},
+                    {name: 'California Exotic Novelties'},
+                    {name: 'Pipedream'},
+                    {name: 'Lovetoy'},
+                    {name: 'Vibe Therapy'},
+                    {name: 'Doc Johnson'},
+                    {name: 'B-Swish'},
+                    {name: 'Tenga'},
+                    {name: 'Close2you'},
+                    {name: 'Love in the Pocket'},
+                    {name: 'PlayHouse'},
                 ];
 
                 return Brand.create(brands);

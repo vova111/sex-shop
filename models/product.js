@@ -40,7 +40,7 @@ const productSchema = new Schema({
         },
         discountCost: {
             type: Schema.Types.Number,
-            default: 0
+            default: null
         },
         isDiscount: {
             type: Schema.Types.Boolean,
@@ -59,7 +59,8 @@ const productSchema = new Schema({
         },
     },
     specifications: {
-        type: Schema.Types.String,
+        type: Schema.Types.Map,
+        of: String,
         default: null
     },
     country: {
@@ -83,13 +84,45 @@ const productSchema = new Schema({
     category: [
         productCategorySchema
     ],
-    photo: [
+    photos: [
         productImageSchema
     ]
 });
 
 productSchema.plugin(mongoosePaginator, {
     maxLimit: 10,
+});
+
+productSchema.virtual('price').get(function () {
+    const price = this.cost.discountCost ? this.cost.discountCost : this.cost.mainCost;
+    return price / 100;
+});
+
+productSchema.statics.getUniqueFilename = function() {
+    return `${mongoose.Types.ObjectId()}.jpg`;
+};
+
+productSchema.statics.createSpecificationsObject = function(names, values) {
+    const object = {};
+
+    if (Array.isArray(names)) {
+        for (let i = 0; i < names.length; i++) {
+            object[names[i]] = values[i];
+        }
+    } else {
+        return null;
+    }
+
+    return object;
+};
+
+productSchema.pre('save', async function (next) {
+    this.cost.mainCost *= 100;
+    this.cost.discountCost = this.cost.discountCost ? this.cost.discountCost * 100 : 0;
+
+    this.cost.isDiscount = !!this.cost.discountCost;
+
+    next();
 });
 
 const Product = mongoose.model('Product', productSchema);

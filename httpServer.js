@@ -28,37 +28,20 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Настраиваем сессии
-// Именно в этом месте после того как сессия прошла процесс настрийки
-// происходит проверка, что находится в Cookies.
-// А конкретнее объект Session ищет в объекте Cookie значение с Id сессии.
-// Обекты Session и Cookie находятся в объекте Request (req в middleware функции)
 app.use(session({
-  name: config.get('session:name'),         // Под этим именем будет храниться cookies с Id сессии
-  resave: false,                            // Указываем, что не нужно каждый запрос пересохранять сессию
+  name: config.get('session:name'),
+  resave: false,
   saveUninitialized: false,
-  secret: config.get('session:secret'),     // Этот ключ будет использоваться для хешированния Id сессии
+  secret: config.get('session:secret'),
   cookie: {
-    maxAge: config.get('session:lifetime'), // Время жизни cookies
+    maxAge: config.get('session:lifetime'),
     sameSite: true,
-    secure: config.get('session:in_prod'),  // Нужно менять на рабочем сервере с https
+    secure: config.get('session:in_prod'),
   }
 }));
 
 app.use(require('flash')());
 
-// Проверяем был ли установлен у пользователя (браузера) Cookies с именем token
-// Он должен быть установлен если пользоваль поставил на форме логина
-// галочку Remember Me
-// app.use(authController.checkTokenInUserCookies);
-
-// Настраиваем доступ к страницам сайта для авторизированных пользователей
-// и не для авторизированных пользователей
-// app.use(authController.allowUserToPage);
-
-// Проверяем если пользователь авторизирован, тогда мы берем его Id из сессии,
-// вытягиваем его из базы данных и сохраняем в res.locals
-// Источник: https://expressjs.com/en/api.html#res.locals
 app.use(authController.getUserFromDatabaseBySessionUserId);
 
 // Routes prefix
@@ -75,6 +58,7 @@ app.use('/backend/product', backendProductRouter);
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {
+// вытягиваем его из базы данных и сохраняем в res.locals
   next(createError(404));
 });
 

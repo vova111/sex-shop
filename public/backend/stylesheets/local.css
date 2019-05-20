@@ -120,8 +120,8 @@ body {
 }
 
 .preview-lg {
-    height: 9rem;
-    width: 20rem;
+    height: 20rem;
+    width: 22rem;
 }
 
 .preview-md {
@@ -150,6 +150,25 @@ body {
 
 .hidden-uploaded {
     display: none;
+}
+
+.product-image {
+    float: left;
+    margin: 0 20px 25px 0;
+}
+
+.product-img {
+    float: left;
+    border: 1px solid #e6e6e6;
+    margin-bottom: 5px;
+}
+
+.product-buttons {
+
+}
+
+.product-buttons button {
+
 }
 
 /* Nav Messages */
