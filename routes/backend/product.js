@@ -18,4 +18,7 @@ router.post('/slug', productController.getSlug);
 router.post('/prevalidation', productController.prevalidation);
 router.post('/remove', productController.canDelete);
 
+router.post('/image/main', productController.setMainImage);
+router.post('/image/remove', productController.removeImage);
+
 module.exports = router;

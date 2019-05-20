@@ -145,6 +145,11 @@ const getImageId = (target) => {
     return parent.dataset.item;
 };
 
+const getImageProductId = (target) => {
+    const parent = getImageContainer(target);
+    return parent.dataset.product;
+};
+
 const getImageContainer = (target) => {
     return target.parentNode.parentNode;
 };
@@ -159,7 +164,20 @@ const imagesActions = (event) => {
             const btnSuccess = 'btn-success';
 
             if (imageId !== undefined) {
-                // Здесь нужно обращаться к серверу и помечать картинку как основную
+                const productId = getImageProductId(target);
+
+                axios.post('/backend/product/image/main', {
+                        imageId: imageId,
+                        productId: productId
+                    })
+                    .then((response) => {
+                        if (!response.data.result) {
+                            alertify.alert('Ошибка', 'Это изображение не удалось установить как основное.');
+                        }
+                    })
+                    .catch((error) => {
+                        showFormErrors(error);
+                    });
             }
 
             const changeButtonInner = (button, text, removeClass, addClass) => {
@@ -211,7 +229,20 @@ const imagesActions = (event) => {
                 const imageId = getImageId(target);
 
                 if (imageId !== undefined) {
-                    // Здесь нужно лезть на сервер и удалять изображение
+                    const productId = getImageProductId(target);
+
+                    axios.post('/backend/product/image/remove', {
+                            imageId: imageId,
+                            productId: productId
+                        })
+                        .then((response) => {
+                            if (!response.data.result) {
+                                alertify.alert('Ошибка', 'Это изображение не удалось удалить.');
+                            }
+                        })
+                        .catch((error) => {
+                            showFormErrors(error);
+                        });
                 }
 
                 container.remove();
@@ -321,6 +352,7 @@ const removeSpecificationField = (event) => {
 
 document.addEventListener('DOMContentLoaded', () => {
     const form = document.querySelector('form[name=product]');
+    const productIdFromForm = form.dataset.product;
     const nameField = document.querySelector('input[name=name]');
     const codeField = document.querySelector('input[name=code]');
     const slugField = document.querySelector('input[name=slug]');
@@ -457,7 +489,8 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             axios.post('/backend/product/prevalidation', {
                     code: codeField.value,
-                    slug: slugField.value
+                    slug: slugField.value,
+                    productId: productIdFromForm
                 })
                 .then((response) => {
                     if (response.data.messages.length) {

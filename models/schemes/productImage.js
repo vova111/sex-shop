@@ -1,4 +1,6 @@
 const mongoose = require('mongoose');
+const productImgUrl = require('config').get('path:products:url');
+const productThumbImgUrl = require('config').get('path:products:thumb:url');
 
 const Schema = mongoose.Schema;
 
@@ -12,6 +14,10 @@ const productImageSchema = new Schema({
         type: Schema.Types.Boolean,
         default: false
     }
-}, {
-    _id: false
 });
+
+productImageSchema.virtual('thumbUrl').get(function () {
+    return `${productThumbImgUrl}${this.name}`;
+});
+
+module.exports = productImageSchema;

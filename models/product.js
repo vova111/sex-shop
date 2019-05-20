@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 const mongoosePaginator = require('mongoose-paginator-simple');
 const fs = require('fs-extra');
-const productCategorySchema = require('models/schemes/productCategory');
 const productImageSchema = require('models/schemes/productImage');
 const productImgPath = require('config').get('path:products:photo');
 const productImgUrl = require('config').get('path:products:url');
@@ -65,7 +64,7 @@ const productSchema = new Schema({
     },
     country: {
         type: Schema.Types.ObjectId,
-        ref: 'Category',
+        ref: 'Country',
         default: null,
         index: true
     },
@@ -82,11 +81,13 @@ const productSchema = new Schema({
         index: true
     },
     category: [
-        productCategorySchema
+        Schema.Types.ObjectId
     ],
-    photos: [
-        productImageSchema
-    ]
+    photos: {
+        type: [productImageSchema]
+    }
+}, {
+    timestamps: true
 });
 
 productSchema.plugin(mongoosePaginator, {
@@ -95,7 +96,23 @@ productSchema.plugin(mongoosePaginator, {
 
 productSchema.virtual('price').get(function () {
     const price = this.cost.discountCost ? this.cost.discountCost : this.cost.mainCost;
+
     return price / 100;
+});
+
+productSchema.virtual('formattedPrice').get(function () {
+    const cost = this.cost.discountCost ? this.cost.discountCost : this.cost.mainCost;
+    const price = cost / 100;
+
+    return price.toFixed(2);
+});
+
+productSchema.virtual('formattedCost').get(function () {
+    return (this.cost.mainCost / 100).toFixed(2);
+});
+
+productSchema.virtual('formattedDiscount').get(function () {
+    return this.cost.discountCost ? (this.cost.discountCost / 100).toFixed(2) : null;
 });
 
 productSchema.statics.getUniqueFilename = function() {
@@ -114,6 +131,46 @@ productSchema.statics.createSpecificationsObject = function(names, values) {
     }
 
     return object;
+};
+
+productSchema.statics.setNewMainImage = async function(imageId, productId) {
+    await Product.clearMainImage(productId);
+
+    return Product.updateOne(
+        {_id: productId, 'photos._id': imageId},
+        {$set: { "photos.$.isMain" : true}}
+    ).exec();
+};
+
+productSchema.statics.clearMainImage = async function(productId) {
+    return Product.updateOne(
+        {_id: productId},
+        {'$set': {
+                'photos.$[].isMain': false
+            }
+        }).exec();
+};
+
+productSchema.statics.removeImage = async function(imageId, productId) {
+    const product = await Product.findById(productId);
+
+    for (let i = 0; i < product.photos.length; i++) {
+        if (product.photos[i].id === imageId) {
+            await fs.remove(`${productImgPath}${product.photos[i].name}`);
+            await fs.remove(`${productThumbImgPath}${product.photos[i].name}`);
+            break;
+        }
+    }
+
+    return Product.findByIdAndUpdate(productId, {
+        $pull: {
+            photos: { _id: imageId }
+        }
+    }).exec();
+};
+
+productSchema.statics.getObjectId = function() {
+    return mongoose.Types.ObjectId();
 };
 
 productSchema.pre('save', async function (next) {

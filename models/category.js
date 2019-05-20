@@ -40,7 +40,7 @@ categorySchema.virtual('categoryId').get(function () {
     return !this.parent ? null : this.parent.toString();
 });
 
-categorySchema.statics.getTreeForMultiSelect = async function (present = null) {
+categorySchema.statics.getTreeForMultiSelect = async function (present = []) {
     const categories = await prepareTree();
 
     const buildGroupSelect = (categories) => {
@@ -56,7 +56,8 @@ categorySchema.statics.getTreeForMultiSelect = async function (present = null) {
 
                 selectHtml += '</optgroup>';
             } else {
-                selectHtml += `<option value="${category._id}">${category.name}</option>`;
+                const selected = present.indexOf(category._id) !== -1 ? ' selected' : '';
+                selectHtml += `<option value="${category._id}"${selected}>${category.name}</option>`;
             }
         }
 
@@ -67,7 +68,7 @@ categorySchema.statics.getTreeForMultiSelect = async function (present = null) {
 };
 
 const prepareTree = async (fields = 'id name parent', where = {}) => {
-    const categories = await Category.find(where).select(fields).sort({sort: 1});
+    const categories = await Category.find(where).select(fields).sort({sort: 1}).lean();
     const json = JSON.stringify(categories);
 
     return arrayToTree(JSON.parse(json), {

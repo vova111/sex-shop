@@ -17,14 +17,10 @@ const indexView = async (req, res, next) => {
 
     const whereProduct = typeof req.query.name === 'undefined'
         ? {}
-        : {'name': { '$regex': req.query.name, '$options': 'i' }, 'code': { '$regex': req.query.name, '$options': 'i' }};
+        : {$or: [{'name': { '$regex': req.query.name, '$options': 'i' }}, {'code': { '$regex': req.query.name, '$options': 'i' }}]};
 
     const products = await Product.paginate(whereProduct, {sort: sort, page: page, lean: false});
 
-    const prod = await Product.findById('5ce1202c66108f25046980d8');
-    console.log(prod.price);
-
-    console.log(products.data[0].price);
     const prelink = '/backend/product' + queryStringBuilder.buildString(req.url);
     const paginator = pagination.create(prelink, products.page, products.limit, products.total);
     const paginationData = paginator.getPaginationData();
@@ -140,9 +136,19 @@ const editView = async (req, res, next) => {
     const id = req.params.id;
 
     try {
-        const seller = await Product.findById(id);
+        const product = await Product.findById(id).populate('seller', 'id name');
+        const countries = await Country.find({}).sort({name: 1});
+        const brands = await Brand.find({}).sort({name: 1});
+        const categories = await Category.getTreeForMultiSelect(product.category);
 
-        res.render('backend/seller/edit', { title: 'Редактирование продавца', data: seller, error: false });
+        res.render('backend/product/edit', {
+            title: 'Редактирование товара',
+            data: product,
+            countries: countries,
+            brands: brands,
+            categories: categories,
+            error: false
+        });
     } catch (error) {
         next();
     }
@@ -150,39 +156,97 @@ const editView = async (req, res, next) => {
 
 const editAction = async (req, res, next) => {
     const id = req.params.id;
-    const { name, slug, logo } = req.body;
 
     try {
         const ajv = new Ajv({verbose: true});
-        const validSeller = ajv.validate(ProductJsonSchema, req.body);
+        const validProduct = ajv.validate(ProductJsonSchema, req.body);
 
-        if (!validSeller) {
+        if (!validProduct) {
             const message = `${ajv.errors[0].parentSchema.description} ${ajv.errors[0].message}`;
             throw new Error(message);
         }
 
-        const seller = await Product.findById(id);
+        const product = await Product.findById(id);
 
-        seller.name = name;
-        seller.slug = slug;
+        const { name, code, category, slug, short, full } = req.body;
+        const specificationNames = req.body.specification_name;
+        const specificationValues = req.body.specification_value;
+        const imagesThumb = req.body.image_thumb;
+        const imagesFull = req.body.image_full;
+        const imagesMain = req.body.image_main;
+        let { cost, discount, seller, brand, country, stock } = req.body;
 
-        if (logo) {
-            const filename = Product.getUniqueFilename();
-            await fs.outputFile(`${sellerImgPath}${filename}`, logo, 'base64');
-            seller.logo = filename;
+        cost = Number(cost);
+        discount = discount.length ? Number(discount) : null;
+        seller = seller.length ? seller : null;
+        brand = brand.length ? brand : null;
+        country = country.length ? country : null;
+        stock = stock.length ? true : false;
+
+        if (imagesThumb) {
+            const images = [];
+            let hasMainImage = false;
+
+            for (let i = 0; i < imagesThumb.length; i++) {
+                const isMain = Number(imagesMain[i]);
+
+                const productImage = {
+                    _id: Product.getObjectId(),
+                    name: Product.getUniqueFilename(),
+                    isMain: isMain
+                };
+
+                if (isMain) {
+                    hasMainImage = true;
+                }
+
+                await fs.outputFile(`${productThumbImgPath}${productImage.name}`, imagesThumb[i], 'base64');
+                await fs.outputFile(`${productImgPath}${productImage.name}`, imagesFull[i], 'base64');
+
+                images.push(productImage);
+            }
+
+            if (hasMainImage) {
+                await Product.clearMainImage(id);
+            }
+
+            for (let i = 0; i < images.length; i++) {
+                product.photos.push(images[i]);
+            }
         }
 
-        await seller.save();
+        product.name = name;
+        product.code = code;
+        product.inStock = stock;
+        product.slug = slug;
+        product.cost.mainCost = cost;
+        product.cost.discountCost = discount;
+        product.description.short = short;
+        product.description.full = full;
+        product.specifications = Product.createSpecificationsObject(specificationNames, specificationValues);
+        product.country = country;
+        product.brand = brand;
+        product.seller = seller;
+        product.category = category;
 
-        req.flash('success', 'Продавец был успешно отредактирована.');
+        await product.save();
 
-        res.redirect('/backend/seller');
+        req.flash('success', 'Товар был успешно отредактирована.');
+
+        res.redirect('/backend/product');
     } catch (error) {
-        if (error.code === 11000) {
-            error.message = 'Продавец с такой постоянной ссылкой уже существует.';
-        }
-
-        res.render('backend/seller/edit', { title: 'Редактирование продавца', data: req.body, error: error.message });
+        const countries = await Country.find({}).sort({name: 1});
+        const brands = await Brand.find({}).sort({name: 1});
+        const categories = await Category.getTreeForMultiSelect(req.body.category);
+        console.log(error.message);
+        res.render('backend/product/edit', {
+            title: 'Редактирование товара',
+            data: req.body,
+            countries: countries,
+            brands: brands,
+            categories: categories,
+            error: error.message
+        });
     }
 };
 
@@ -206,11 +270,14 @@ const getSlug = (req, res, next) => {
 };
 
 const prevalidation = async (req, res, next) => {
-    const { code, slug } = req.body;
+    const { code, slug, productId } = req.body;
     const messages = [];
 
-    const hasCode = await Product.findOne({code: code});
-    const hasSlug = await Product.findOne({slug: slug});
+    const hasCodeWhere = productId ? {code: code, _id: {$ne: productId}} : {code: code};
+    const hasCodeSlug = productId ? {slug: slug, _id: {$ne: productId}} : {slug: slug};
+
+    const hasCode = await Product.findOne(hasCodeWhere);
+    const hasSlug = await Product.findOne(hasCodeSlug);
 
     if (hasCode) {
         messages.push(' Товар с таким кодом уже существует');
@@ -236,6 +303,20 @@ const canDelete = async (req, res, next) => {
     }
 };
 
+const setMainImage = async (req, res, next) => {
+    const { imageId, productId } = req.body;
+    const result = await Product.setNewMainImage(imageId, productId);
+
+    res.json({status: true, result: !!result.ok});
+};
+
+const removeImage = async (req, res, next) => {
+    const { imageId, productId } = req.body;
+    await Product.removeImage(imageId, productId);
+
+    res.json({status: true, result: true});
+};
+
 module.exports.indexView = indexView;
 module.exports.createView = createView;
 module.exports.createAction = createAction;
@@ -245,3 +326,5 @@ module.exports.deleteAction = deleteAction;
 module.exports.getSlug = getSlug;
 module.exports.prevalidation = prevalidation;
 module.exports.canDelete = canDelete;
+module.exports.setMainImage = setMainImage;
+module.exports.removeImage = removeImage;

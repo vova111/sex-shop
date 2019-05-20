@@ -62,8 +62,14 @@
                                 <th scope="row"><%= counter++ %></th>
                                 <td><%= product.name %></td>
                                 <td><%= product.code %></td>
-                                <td><%= product.price %></td>
-                                <td><%= product.code %></td>
+                                <td><%= product.formattedPrice %></td>
+                                <td>
+                                    <% if (product.inStock) { %>
+                                        есть
+                                    <% } else { %>
+                                        <span class="text-danger">отсутствует</span>
+                                    <% } %>
+                                </td>
                                 <td>
                                     <a href="/backend/product/edit/<%= product._id %>"><i class="fa fa-edit"></i> редактировать</a>
                                     <a href="javascript:;" data-item="<%= product._id %>" data-url="product" data-check="remove" class="text-danger delete"><i class="fa fa-trash-o"></i> удалить</a>

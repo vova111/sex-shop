@@ -8,6 +8,7 @@
     <link rel="stylesheet" type="text/css" href="/backend/stylesheets/font-awesome.min.css" />
     <link rel="stylesheet" type="text/css" href="/plugins/cropperjs/cropper.min.css" />
     <link rel="stylesheet" type="text/css" href="/plugins/alertify/css/alertify.min.css" />
+    <link rel="stylesheet" type="text/css" href="/plugins/alertify/css/themes/default.min.css" />
     <link rel="stylesheet" type="text/css" href="/plugins/slimselect/slimselect.min.css" />
     <link rel="stylesheet" type="text/css" href="/backend/stylesheets/local.css" />
 </head>
@@ -20,13 +21,13 @@
                 <ul class="breadcrumb">
                     <li><a href="/home">Главная</a></li>
                     <li><a href="/backend/product">Список товаров</a></li>
-                    <li class="active">Создать новый товар</li>
+                    <li class="active">Редактирование товара</li>
                 </ul>
             </div>
         </div>
         <div class="row">
             <div class="col-lg-12">
-                <h1 class="page-header">Создать новый товар</h1>
+                <h1 class="page-header">Редактирование товара</h1>
             </div>
         </div>
         <div class="error-container">
@@ -42,7 +43,7 @@
         </div>
         <div class="row">
             <div class="col-lg-12">
-                <form action="" method="post" role="form" name="product" enctype="multipart/form-data">
+                <form action="/backend/product/edit/<%= data.id %>" data-product="<%= data.id %>" method="post" role="form" name="product" enctype="multipart/form-data">
                     <div class="row">
                         <div class="col-lg-6">
                             <div class="form-group">
@@ -63,14 +64,14 @@
                         <div class="col-lg-6">
                             <div class="form-group">
                                 <label>Цена: <span class="text-danger">*</span></label>
-                                <input class="form-control" type="text" name="cost" value="<%= data.cost %>" maxlength="8" placeholder="Цена">
+                                <input class="form-control" type="text" name="cost" value="<%= data.formattedCost %>" maxlength="8" placeholder="Цена">
                                 <p class="help-block">Укажите цену товара здесь. ( Это поле обязательное. )</p>
                             </div>
                         </div>
                         <div class="col-lg-6">
                             <div class="form-group">
                                 <label>Скидочная цена:</label>
-                                <input class="form-control" type="text" name="discount" value="<%= data.discount %>" maxlength="8" placeholder="Скидочная цена">
+                                <input class="form-control" type="text" name="discount" value="<%= data.formattedDiscount %>" maxlength="8" placeholder="Скидочная цена">
                                 <p class="help-block">Укажите цену товара со скидкой здесь.</p>
                             </div>
                         </div>
@@ -91,7 +92,11 @@
                             <div class="form-group">
                                 <label>Продавец: </label>
                                 <select name="seller">
-                                    <option value="">отсутствует</option>
+                                    <% if (data.seller) { %>
+                                        <option value="<%= data.seller.id %>" selected><%= data.seller.name %></option>
+                                    <% } else { %>
+                                        <option value="">отсутствует</option>
+                                    <% } %>
                                 </select>
                                 <p class="help-block">Выберите продавца товара.</p>
                             </div>
@@ -105,7 +110,7 @@
                                     <select name="brand">
                                         <option value="">отсутствует</option>
                                         <% brands.forEach(function(brand) { %>
-                                            <% if (data.brand === brand.id) { %>
+                                            <% if (data.brand == brand.id) { %>
                                                 <option value="<%= brand.id %>" selected><%= brand.name %></option>
                                             <% } else { %>
                                                 <option value="<%= brand.id %>"><%= brand.name %></option>
@@ -122,7 +127,7 @@
                                 <select name="country">
                                     <option value="">отсутствует</option>
                                     <% countries.forEach(function(country) { %>
-                                        <% if (data.country === country.id) { %>
+                                        <% if (data.country == country.id) { %>
                                             <option value="<%= country.id %>" selected><%= country.name %></option>
                                         <% } else { %>
                                             <option value="<%= country.id %>"><%= country.name %></option>
@@ -146,7 +151,7 @@
                                 <label>В наличии</label>
                                 <div class="checkbox">
                                     <label>
-                                        <input type="checkbox" name="stock" checked> Этот товар есть на складе
+                                        <input type="checkbox" name="stock" <% if (data.inStock) { %> checked <% } %>> Этот товар есть на складе
                                     </label>
                                 </div>
                             </div>
@@ -157,27 +162,65 @@
                         <div class="col-lg-6">
                             <div class="form-group">
                                 <label>Краткое описание товара:</label>
-                                <textarea class="form-control" name="short" rows="6" placeholder="Краткое описание товара"><%= data.short %></textarea>
+                                <textarea class="form-control" name="short" rows="6" placeholder="Краткое описание товара"><%= data.description.short %></textarea>
                                 <p class="help-block">Напишите краткое описание товара, пару предложений.</p>
                             </div>
                         </div>
                         <div class="col-lg-6">
                             <div class="form-group">
                                 <label>Полное описание товара:</label>
-                                <textarea class="form-control" name="full" rows="6" placeholder="Полное описание товара"><%= data.full %></textarea>
+                                <textarea class="form-control" name="full" rows="6" placeholder="Полное описание товара"><%= data.description.full %></textarea>
                                 <p class="help-block">Напишите полное описание товара.</p>
                             </div>
                         </div>
                     </div>
                     <h3 class="page-header">Характеристики</h3>
-                    <div class="product-specification-container"></div>
+                    <div class="product-specification-container">
+                        <% if (data.specifications) { %>
+                            <% data.specifications.forEach(function(value, key) { %>
+                                <div class="row product-specification">
+                                    <div class="col-lg-6">
+                                        <div class="form-group">
+                                            <label>Название характеристики: <span class="text-danger">*</span></label>
+                                            <input class="form-control" type="text" name="specification_name[]" value="<%= key %>" maxlength="100" placeholder="Название характеристики">
+                                            <p class="help-block"><a class="text-danger remove-specification" href="javascript:;"><i class="fa fa-trash-o"></i> удалить эту характеристику</a></p>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <div class="form-group">
+                                            <label>Описание характеристики: <span class="text-danger">*</span></label>
+                                            <input class="form-control" type="text" name="specification_value[]" value="<%= value %>" maxlength="250" placeholder="Описание характеристики">
+                                        </div>
+                                    </div>
+                                </div>
+                            <% }); %>
+                        <% } %>
+                    </div>
                     <div class="row">
                         <div class="col-lg-12">
                             <button type="button" class="btn btn-success btn-xs add-specification"><i class="fa fa-plus"></i> Добавить характеристику</button>
                         </div>
                     </div>
                     <h3 class="page-header">Изображения</h3>
-                    <div class="product-images-container"></div>
+                    <div class="product-images-container">
+                        <% if (data.photos) { %>
+                            <% data.photos.forEach(function(photo) { %>
+                                <div class="product-image" data-item="<%= photo.id %>" data-product="<%= data.id %>">
+                                    <div class="product-img">
+                                        <img src="<%= photo.thumbUrl %>">
+                                    </div>
+                                    <div class="product-buttons">
+                                        <% if (photo.isMain) { %>
+                                            <button type="button" class="btn btn-xs product-image-change-main btn-success"><i class="fa fa-check"></i> Основное</button>
+                                        <% } else { %>
+                                            <button type="button" class="btn btn-xs product-image-change-main btn-primary"><i class="fa fa-check"></i> Сделать основным</button>
+                                        <% } %>
+                                        <button type="button" class="btn btn-danger btn-xs product-image-delete"><i class="fa fa-trash-o"></i> Удалить</button>
+                                    </div>
+                                </div>
+                            <% }); %>
+                        <% } %>
+                    </div>
                     <div class="row">
                         <div class="col-lg-12">
                             <div class="form-group">
@@ -203,7 +246,7 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <button type="submit" class="btn btn-primary">Создать</button>
+                        <button type="submit" class="btn btn-primary">Сохранить</button>
                         <a href="/backend/product" class="btn btn-default">Отмена</a>
                     </div>
                 </form>

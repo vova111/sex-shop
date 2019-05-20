@@ -17,7 +17,7 @@ module.exports = {
             url: '/uploads/products/',
             thumb: {
                 photo: productThumbImgPath,
-                utl: '/uploads/products/thumbnails/'
+                url: '/uploads/products/thumbnails/'
             }
         }
     }
