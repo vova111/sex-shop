@@ -1,0 +1,35 @@
+@import 'normalize';
+@import 'variables';
+@import 'fonts';
+
+html {
+  font-size: $base-font-size;
+  height: 100%;
+}
+
+body {
+  font-family: $main-font;
+  height: 100%;
+}
+
+*, *:before, *:after {
+  box-sizing: border-box;
+}
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.content {
+  flex: 1 0 auto;
+}
+
+.container {
+  margin: 0 auto;
+  max-width: $content-size;
+  width: 100%;
+}
+
+@import "modules/header";

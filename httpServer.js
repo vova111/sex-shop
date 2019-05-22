@@ -2,6 +2,7 @@ const createError = require('http-errors');
 const express = require('express');
 const path = require('path');
 const cookieParser = require('cookie-parser');
+const sassMiddleware = require('node-sass-middleware');
 const logger = require('morgan');
 const config = require('config');
 const session = require('express-session');
@@ -26,6 +27,12 @@ app.set('view engine', 'ejs');
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use(sassMiddleware({
+  src: path.join(__dirname, 'public'),
+  dest: path.join(__dirname, 'public'),
+  indentedSyntax: false, // true = .sass and false = .scss
+  sourceMap: false
+}));
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(session({
