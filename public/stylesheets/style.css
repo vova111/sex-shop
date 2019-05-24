@@ -370,19 +370,19 @@ th {
 
 @font-face {
   font-family: 'Google Sans';
-  src: local("Open Sans"), local("OpenSans"), url("../fonts/GoogleSans-Regular.ttf") format("truetype");
+  src: local("Google Sans"), local("GoogleSans"), url("../fonts/GoogleSans-Regular.ttf") format("truetype");
   font-weight: 400;
   font-style: normal; }
 
 @font-face {
   font-family: 'Google Sans';
-  src: local("Open Sans Medium"), local("OpenSans-Medium"), url("../fonts/GoogleSans-Medium.ttf") format("truetype");
+  src: local("Google Sans Medium"), local("GoogleSans-Medium"), url("../fonts/GoogleSans-Medium.ttf") format("truetype");
   font-weight: 500;
   font-style: normal; }
 
 @font-face {
   font-family: 'Google Sans';
-  src: local("Open Sans Bold"), local("OpenSans-Bold"), url("../fonts/GoogleSans-Bold.ttf") format("truetype");
+  src: local("Google Sans Bold"), local("GoogleSans-Bold"), url("../fonts/GoogleSans-Bold.ttf") format("truetype");
   font-weight: 700;
   font-style: normal; }
 
@@ -391,8 +391,9 @@ html {
   height: 100%; }
 
 body {
-  font-family: "Open Sans", Arial, sans-serif;
-  height: 100%; }
+  font-family: "Google Sans", Arial, sans-serif;
+  height: 100%;
+  background: #fafafa; }
 
 *, *:before, *:after {
   box-sizing: border-box; }
@@ -416,7 +417,7 @@ body {
 
 .header-main {
   background-color: #ffffff;
-  padding: 20px 0 10px; }
+  padding: 20px 0 19px; }
 
 .header-content {
   align-items: center;
@@ -471,21 +472,25 @@ body {
   .header-burger .menu-btn span::after {
     transform: translateY(5px); }
 
-.header-logo-container {
-  align-items: center;
-  justify-content: center;
-  display: flex; }
-  .header-logo-container-icon {
-    margin: 0 3px 0 -5px; }
-    .header-logo-container-icon > img {
-      height: 38px; }
-  .header-logo-container-name > img {
-    height: 20.6px; }
+.header-logo {
+  margin-right: 68px; }
+  .header-logo-container {
+    align-items: center;
+    justify-content: center;
+    display: flex; }
+    .header-logo-container-icon {
+      margin: 0 3px 0 -5px; }
+      .header-logo-container-icon > img {
+        height: 38px; }
+    .header-logo-container-name > img {
+      height: 20.6px; }
 
 .header-catalog {
   height: 44px;
   background: linear-gradient(0deg, #7359BE, #7359BE), #2D9CDB;
-  border-radius: 1px; }
+  border-radius: 1px;
+  width: 195px;
+  margin-right: 17px; }
   .header-catalog a {
     text-decoration: none; }
   .header-catalog-container {
@@ -494,32 +499,115 @@ body {
     height: 100%; }
     .header-catalog-container-text {
       color: #ffffff;
-      font-weight: bold;
+      font-weight: 500;
+      padding-left: 13px;
+      flex-grow: 1; }
+    .header-catalog-container-burger {
+      padding-right: 13px; }
+      .header-catalog-container-burger .catalog-burger {
+        display: block;
+        width: 16px;
+        height: 11px;
+        position: relative; }
+      .header-catalog-container-burger .catalog-burger span,
+      .header-catalog-container-burger .catalog-burger span::before,
+      .header-catalog-container-burger .catalog-burger span::after {
+        position: absolute;
+        top: 50%;
+        margin-top: -1px;
+        left: 50%;
+        margin-left: -8px;
+        width: 16px;
+        height: 2px;
+        background-color: #ffffff; }
+      .header-catalog-container-burger .catalog-burger span::before,
+      .header-catalog-container-burger .catalog-burger span::after {
+        content: '';
+        display: block;
+        transition: 0.2s; }
+      .header-catalog-container-burger .catalog-burger span::before {
+        transform: translateY(-4px); }
+      .header-catalog-container-burger .catalog-burger span::after {
+        transform: translateY(4px); }
+
+.header-search {
+  height: 44px;
+  background: #FCFCFC;
+  border: 1px solid #E8E8EE;
+  box-sizing: border-box;
+  border-radius: 1px;
+  padding: 13px 15px 13px 18px;
+  flex-grow: 1; }
+  .header-search-container {
+    align-items: center;
+    display: flex;
+    height: 100%; }
+    .header-search-container-field {
+      flex-grow: 1; }
+      .header-search-container-field input {
+        width: 100%;
+        font-weight: 500;
+        color: #A3A3A3;
+        background-color: transparent;
+        border: none;
+        outline: none; }
+        .header-search-container-field input::-webkit-input-placeholder {
+          color: #A3A3A3; }
+        .header-search-container-field input::-moz-placeholder {
+          color: #A3A3A3; }
+        .header-search-container-field input:-ms-input-placeholder {
+          color: #A3A3A3; }
+        .header-search-container-field input:-moz-placeholder {
+          color: #A3A3A3; }
+    .header-search-container-button {
       padding-left: 13px; }
-    .header-catalog-container-burger .catalog-burger {
-      display: block;
-      width: 30px;
-      height: 30px;
-      /*background-color: #fff;
-          border-radius: 50%;*/
+
+.header-counter {
+  display: block;
+  position: absolute;
+  height: 12px;
+  border-radius: 12px;
+  background-color: #7359BE;
+  top: 0;
+  right: -5px;
+  text-align: center;
+  color: #ffffff;
+  font-size: 9px;
+  padding: 0px 4px; }
+
+.header-favorite {
+  margin: 0 35px 0 51px; }
+  .header-favorite-container {
+    align-items: center;
+    display: flex;
+    height: 100%; }
+    .header-favorite-container-icon {
       position: relative; }
-    .header-catalog-container-burger .catalog-burger span,
-    .header-catalog-container-burger .catalog-burger span::before,
-    .header-catalog-container-burger .catalog-burger span::after {
-      position: absolute;
-      top: 50%;
-      margin-top: -1px;
-      left: 50%;
-      margin-left: -10px;
-      width: 20px;
-      height: 2px;
-      background-color: #ffffff; }
-    .header-catalog-container-burger .catalog-burger span::before,
-    .header-catalog-container-burger .catalog-burger span::after {
-      content: '';
-      display: block;
-      transition: 0.2s; }
-    .header-catalog-container-burger .catalog-burger span::before {
-      transform: translateY(-5px); }
-    .header-catalog-container-burger .catalog-burger span::after {
-      transform: translateY(5px); }
+      .header-favorite-container-icon img {
+        width: 23px; }
+
+.header-basket {
+  height: 44px; }
+  .header-basket a {
+    text-decoration: none; }
+  .header-basket-container {
+    align-items: center;
+    display: flex;
+    height: 100%; }
+    .header-basket-container-icon {
+      position: relative; }
+      .header-basket-container-icon img {
+        width: 25px;
+        fill: black; }
+      .header-basket-container-icon span {
+        right: -7px; }
+    .header-basket-container-text {
+      width: 103px;
+      font-size: 12px;
+      font-weight: bold;
+      line-height: 15px;
+      color: #313131;
+      padding-left: 16px;
+      margin-top: -6px; }
+      .header-basket-container-text span {
+        color: #7359BE; }
