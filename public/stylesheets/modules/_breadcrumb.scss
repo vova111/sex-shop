@@ -1,0 +1,23 @@
+.breadcrumb {
+  margin: 27px 0;
+  padding: 0;
+  list-style: none;
+  line-height: 16px;
+  font-weight: 500;
+  display: block;
+  > li+li:before {
+    padding: 0 13px;
+    color: #979FAD;
+    content: "/\00a0";
+  }
+  li {
+    display: inline-block;
+    a {
+      text-decoration: none;
+      color: #979FAD;
+    }
+  }
+  .active {
+    color: #333333;
+  }
+}
