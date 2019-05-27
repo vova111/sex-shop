@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const mongoosePaginator = require('mongoose-paginator-simple');
 const arrayToTree = require('array-to-tree');
+const Product = require('models/product');
 
 const Schema = mongoose.Schema;
 
@@ -65,6 +66,52 @@ categorySchema.statics.getTreeForMultiSelect = async function (present = []) {
     };
 
     return buildGroupSelect(categories);
+};
+
+categorySchema.statics.getCategoryWithParents = async function (children) {
+    const categories = await Category.find({_id: {$in: children}}).distinct('parent');
+    return categories.concat(children);
+};
+
+categorySchema.statics.updateProductCountCache = async function () {
+    const aggregatorOpts = [{
+        $unwind: "$category"
+    }, {
+        $group: {
+            _id: '$category',
+            count: {$sum: 1}
+        }
+    }];
+
+    const counts = await Product.aggregate(aggregatorOpts);
+    const productCountsMap = new Map();
+
+    for (let i = 0; i < counts.length; i++) {
+        productCountsMap.set(counts[i]._id.toString(), counts[i].count);
+    }
+
+    const categories = await Category.find({}).select('id productsCount').lean();
+
+    for (let i = 0; i < categories.length; i++) {
+        const categoryId = categories[i]._id.toString();
+
+        if (productCountsMap.has(categoryId)) {
+            const count = productCountsMap.get(categoryId);
+
+            if (count !== categories[i].productsCount) {
+                await Category.updateOne({_id: categoryId}, {productsCount: count});
+            }
+        } else {
+            if (categories[i].productsCount > 0) {
+                await Category.updateOne({_id: categoryId}, {productsCount: 0});
+            }
+        }
+    }
+};
+
+categorySchema.statics.hasSubCategory = async function ($categoryId) {
+    const hasSubCat = await Category.findOne({parent: $categoryId});
+    return hasSubCat !== null;
 };
 
 const prepareTree = async (fields = 'id name parent', where = {}) => {

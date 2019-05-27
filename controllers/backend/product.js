@@ -107,11 +107,12 @@ const createAction = async (req, res, next) => {
             country: country,
             brand: brand,
             seller: seller,
-            category: category,
+            category: await Category.getCategoryWithParents(category),
             photos: images
         });
 
         await product.save();
+        await Category.updateProductCountCache();
 
         req.flash('success', 'Новый товар был успешно добавлен.');
 
@@ -227,9 +228,10 @@ const editAction = async (req, res, next) => {
         product.country = country;
         product.brand = brand;
         product.seller = seller;
-        product.category = category;
+        product.category = await Category.getCategoryWithParents(category);
 
         await product.save();
+        await Category.updateProductCountCache();
 
         req.flash('success', 'Товар был успешно отредактирована.');
 

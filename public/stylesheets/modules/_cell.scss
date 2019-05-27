@@ -1,0 +1,91 @@
+.cell {
+  flex-basis: 200px;
+  border: 1px solid #E9E9E9;
+  padding: 25px 23px 25px 24px;
+  background-color: #ffffff;
+  flex-grow: 1;
+  max-width: 266px;
+  min-width: 0;
+  &-category {
+    display: flex;
+    align-items: center;
+    &-name {
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      text-transform: uppercase;
+      line-height: 18px;
+      color: #939393;
+      font-weight: 500;
+    }
+    .add-to-favorite {
+      display: block;
+      width: 16px;
+      height: 14px;
+      cursor: pointer;
+      background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAOCAYAAAAmL5yKAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAE5SURBVHgBjVLLbYNAEF0WCtgOQkqggoQO0kGSOxC7gpgKiAUSR+jAJaB04BJwBxzgxC9vooEgsrZ50mqHnXlvPowQK6RpagsNsixTOp8xGXEcH3B94Khfh2HkbdvulVKiruvdwlfhHH3fP8wCRB7H8RXmm5SyHIaBMuUQmfQr+Hfsc/H9SQkgElocQOovQRB88/cliiLHsqwCxHPf93ugYl+OhCXuE05oIZCyKVJf9sYER2jQdV0JcZUkyYNEYMklPoqNANmm2/O8i+S3L+pLbEeGhDkZkks64sFGSdk9JvrPESswl3AWoH7x4GLCz7dEmPxEsdz63x4QaKCmaRb4RWdU9T5NnpYIu3CiKpfkfwIrkQoiLi1S0zQFqlNrslZgLULLdI08z2ANCiQC2TwwR0feBFSjbvl/ADEwxD4PSgy5AAAAAElFTkSuQmCC");
+      background-size: 100%
+    }
+  }
+  &-image {
+    margin: 10px 0;
+    img {
+      width: 100%;
+    }
+  }
+  &-price {
+    display: flex;
+    align-items: center;
+    &-main {
+      font-size: 22px;
+      color: #202020;
+      font-weight: bold;
+      &.discount {
+        color: #EB5757;
+      }
+    }
+    &-old {
+      padding-top: 5px;
+      padding-left: 15px;
+      text-decoration: line-through;
+      color: #999999;
+    }
+  }
+  &-name {
+    height: 45px;
+    line-height: 21px;
+    color: #363636;
+    margin: 7px 0 0 0;
+    overflow: hidden;
+  }
+  &-tags {
+    margin-top: 10px;
+    span {
+      display: inline-block;
+      cursor: pointer;
+      font-size: 12px;
+      line-height: 15px;
+      text-align: center;
+      color: #FFFFFF;
+      padding: 1px 8px 3px;
+      font-weight: 500;
+      margin: 0 9px 0 0;
+      &.discount {
+        background-color: #FFA555;
+      }
+      &.bestseller {
+        background: linear-gradient(0deg, #7359BE, #7359BE), #EB5757;
+      }
+      &.new {
+        background-color: #2D9CDB;
+      }
+      &.premium {
+        background-color: #E787FF;
+      }
+      &.only {
+        background-color: #7278FF;
+      }
+    }
+  }
+}

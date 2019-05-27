@@ -1,5 +1,7 @@
 .filter {
   width: 267px;
+  min-width: 267px;
+  margin-right: 14px;
   &-catalog {
     height: 44px;
     background: linear-gradient(0deg, #7359BE, #7359BE), #2D9CDB;
@@ -53,15 +55,133 @@
       }
     }
   }
+  &-categories {
+    position: relative;
+    a {
+      text-decoration: none;
+    }
+    ul {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    .side {
+      width: 267px;
+      margin: 0 0;
+      position: absolute;
+      z-index: 2000;
+    }
+    .side-hidden {
+      display: none;
+    }
+    .menu {
+      padding: 15px 17px 15px 17px;
+      background-color: #ffffff;
+      border: 1px solid #E9E9E9;
+      box-sizing: border-box;
+      box-shadow: 0px 0px 25px rgba(183, 183, 183, 0.25);
+    }
+    .menu a {
+      background-color: #FFFFFF;
+      color: #202020;
+      line-height: 18px;
+      padding: 13px 0 13px 15px;
+      display: block;
+      &:hover {
+        background: linear-gradient(0deg, #7359BE, #7359BE), #2D9CDB;
+        color: #ffffff;
+      }
+    }
+  }
   &-blocks {
-    background: #FCFCFC;
+    background-color: #FCFCFC;
     border: 1px solid #E9E9E9;
   }
   &-block {
-    padding: 17px 14px 14px 16px;
+    padding: 17px 16px 14px 16px;
     border-bottom: 1px solid #E9E9E9;
     &-content {
       margin-top: 15px;
+    }
+    &-disable {
+      position: relative;
+    }
+    &-layer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(236, 236, 236, 0.5);
+      z-index: 1000;
+    }
+  }
+  &-price {
+    background-color: #FFFFFF;
+    .filter-block-content {
+      &-inputs {
+        padding-top: 3px;
+        display: flex;
+        align-items: center;
+        .ranger-input {
+          input {
+            width: 100%;
+            text-align: center;
+            background-color: #FCFCFC;
+            border: 1px solid #F3F2F2;
+            box-sizing: border-box;
+            line-height: 21px;
+            color: #787878;
+            padding: 5px 0;
+          }
+        }
+        .ranger-separator {
+          margin: 0 6px;
+          span {
+            display: block;
+            width: 17px;
+            height: 1px;
+            background-color: #F3F2F2;
+          }
+        }
+      }
+      &-ranger {
+        margin: 35px 0 20px;
+      }
+    }
+  }
+  &-tags {
+    &-container {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-top: -5px;
+      span {
+        display: block;
+        cursor: pointer;
+        font-size: 12px;
+        line-height: 15px;
+        text-align: center;
+        color: #FFFFFF;
+        padding: 1px 8px 3px;
+        font-weight: 500;
+        margin: 0 9px 11px 0;
+        &.discount {
+          background-color: #FFA555;
+        }
+        &.bestseller {
+          background: linear-gradient(0deg, #7359BE, #7359BE), #EB5757;
+        }
+        &.new {
+          background-color: #2D9CDB;
+        }
+        &.premium {
+          background-color: #E787FF;
+        }
+        &.only {
+          background-color: #7278FF;
+        }
+      }
     }
   }
   &-country {
@@ -90,7 +210,7 @@
           content: '';
           position: absolute;
           top: 5px;
-          left: 0;
+          right: 0;
           width: 0;
           height: 0;
           border-style: solid;
@@ -131,5 +251,38 @@
   }
   .content-closed {
     display: none;
+  }
+  .ranger {
+    display: block;
+    position: relative;
+    height: 5px;
+    border: 1px solid #E0E0E3;
+    background-color: #F3F2F2;
+    .slider {
+      display: block;
+      position: absolute;
+      z-index: 100;
+      top: 0;
+      left: 0;
+      margin-top: -12px;
+      margin-left: -13.5px;
+      width: 25px;
+      height: 25px;
+      -webkit-border-radius: 13px;
+      border-radius: 13px;
+      background-color: #fff;
+      border: 3px solid #7359BE;
+      cursor: pointer;
+    }
+    .filler {
+      display: block;
+      position: absolute;
+      z-index: 10;
+      height: 5px;
+      background: linear-gradient(0deg, #7359BE, #7359BE), linear-gradient(89.73deg, #865CFF 4.74%, #5D76FD 97.07%);
+      border-radius: 1px;
+      left: 0;
+      margin-top: -1px;
+    }
   }
 }

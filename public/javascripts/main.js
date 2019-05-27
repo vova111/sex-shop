@@ -4,8 +4,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const catalogContainer = document.querySelector('.side');
 
     catalogButton.addEventListener('click', () => {
-        page.classList.add('overlay');
-        catalogContainer.classList.remove('side-hidden');
+        if (catalogContainer.classList.contains('side-hidden')) {
+            page.classList.add('overlay');
+            catalogContainer.classList.remove('side-hidden');
+        } else {
+            catalogContainer.classList.add('side-hidden');
+            page.classList.remove('overlay');
+        }
     });
 
     catalogContainer.addEventListener('mouseleave', () => {

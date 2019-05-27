@@ -61,7 +61,7 @@ const createAction = async (req, res, next) => {
 
         const category = new Category({
             name: name,
-            parent: !categoryId.length ? null : categoryId,
+            parent: !categoryId ? null : categoryId,
             sort: sort,
             slug: slug
         });
@@ -87,8 +87,15 @@ const editView = async (req, res, next) => {
     try {
         const category = await Category.findById(id);
         const categories = await Category.find({parent: null, _id: {$ne: id}}).sort({sort: 1});
+        const hasSubCategory = await Category.hasSubCategory(id);
 
-        res.render('backend/category/edit', { title: 'Редактирование категории', data: category, categories: categories, error: false });
+        res.render('backend/category/edit', {
+            title: 'Редактирование категории',
+            data: category,
+            categories: categories,
+            hasSubCategory: hasSubCategory,
+            error: false
+        });
     } catch (error) {
         next();
     }
@@ -111,7 +118,7 @@ const editAction = async (req, res, next) => {
         const category = await Category.findById(id);
 
         category.name = name;
-        category.parent = !categoryId.length ? null : categoryId;
+        category.parent = !categoryId ? null : categoryId;
         category.sort = sort;
         category.slug = slug;
 
@@ -126,7 +133,15 @@ const editAction = async (req, res, next) => {
         }
 
         const categories = await Category.find({parent: null, _id: {$ne: id}}).sort({sort: 1});
-        res.render('backend/category/edit', { title: 'Редактирование категории', data: req.body, categories: categories, error: error.message });
+        const hasSubCategory = await Category.hasSubCategory(id);
+
+        res.render('backend/category/edit', {
+            title: 'Редактирование категории',
+            data: req.body,
+            categories: categories,
+            hasSubCategory: hasSubCategory,
+            error: error.message
+        });
     }
 };
 

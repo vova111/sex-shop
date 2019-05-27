@@ -179,6 +179,11 @@ productSchema.pre('save', async function (next) {
 
     this.cost.isDiscount = !!this.cost.discountCost;
 
+    // if (this.isModified('category')) {
+    //     console.log('modif', this.category, Category);
+    //
+    // }
+
     next();
 });
 

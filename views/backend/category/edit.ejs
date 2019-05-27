@@ -45,6 +45,7 @@
                         <input class="form-control" type="text" name="name" value="<%= data.name %>" maxlength="40" placeholder="Название категории">
                         <p class="help-block">Введите название категории здесь. ( Это поле обязательное. )</p>
                     </div>
+                    <% if (!hasSubCategory) { %>
                     <div class="form-group">
                         <label>Родительская категория: </label>
                         <select class="form-control" name="categoryId">
@@ -59,6 +60,17 @@
                         </select>
                         <p class="help-block">Выберите родительскую категорию для новой категории.</p>
                     </div>
+                    <% } else { %>
+                    <fieldset disabled>
+                        <div class="form-group">
+                            <label>Родительская категория: </label>
+                            <select class="form-control" name="categoryId">
+                                <option value="">Сделать основной категорией</option>
+                            </select>
+                            <p class="help-block">Внимание! Вы не можете переместить основную категорию, когда в ней уже существуют подкатегории.</p>
+                        </div>
+                    </fieldset>
+                    <% } %>
                     <div class="form-group">
                         <label>Постоянная ссылка: <span class="text-danger">*</span></label>
                         <input class="form-control" type="text" name="slug" value="<%= data.slug %>" maxlength="40" placeholder="Постоянная ссылка">

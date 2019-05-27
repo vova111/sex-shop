@@ -35,10 +35,12 @@ body {
 
 .overlay {
   height: 100%;
-  background: rgba(50, 50, 50, 0.58);
+  background: rgba(50, 50, 50, 0.78);
   filter: blur(5px);
 }
 
 @import "modules/header";
 @import "modules/breadcrumb";
+@import "modules/cell";
 @import "modules/filter";
+@import "pages/catalog";
