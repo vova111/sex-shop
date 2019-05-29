@@ -114,6 +114,23 @@ categorySchema.statics.hasSubCategory = async function ($categoryId) {
     return hasSubCat !== null;
 };
 
+categorySchema.pre('save', function(next) {
+    if (this.isModified('parent')) {
+        this.wasParentModified = true;
+        console.log('modif1');
+    }
+
+    next();
+});
+
+categorySchema.post('save', function(doc, next) {
+    if (this.wasParentModified) {
+        console.log('modif2');
+    }
+
+    next();
+});
+
 const prepareTree = async (fields = 'id name parent', where = {}) => {
     const categories = await Category.find(where).select(fields).sort({sort: 1}).lean();
     const json = JSON.stringify(categories);
