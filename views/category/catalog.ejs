@@ -63,8 +63,16 @@
                                     <div class="filter-block-name-icon"><span class="toggle"></span></div>
                                 </div>
                                 <div class="filter-block-content">
-                                    <% subCategory.forEach(function(category) { %>
-                                        <div class="checkbox"><%= category.name %> <span>(<%= category.productsCount %>)</span></div>
+                                    <% subCategory.forEach(function(sub) { %>
+                                        <% if (category) { %>
+                                            <% if (category.id === sub.id) { %>
+                                                <div class="checkbox checked" data-category="<%= sub.id %>"><%= sub.name %> <span>(<%= sub.productsCount %>)</span></div>
+                                            <% } else { %>
+                                                <div class="checkbox" data-category="<%= sub.id %>"><%= sub.name %> <span>(<%= sub.productsCount %>)</span></div>
+                                            <% } %>
+                                        <% } else { %>
+                                                <div class="checkbox" data-category="<%= sub.id %>"><%= sub.name %> <span>(<%= sub.productsCount %>)</span></div>
+                                        <% } %>
                                     <% }); %>
                                 </div>
                             </div>

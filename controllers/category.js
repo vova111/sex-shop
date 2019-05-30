@@ -14,13 +14,10 @@ const showCategory = async (req, res, next) => {
         if (category) {
             title = category.name;
             parent = category.parent ? category.parent : category;
-        }
-
-        if (parent) {
             subCategory = await Category.find({parent: parent.id}).sort({sort: 1});
-        } else {
-            subCategory = await Category.find({parent: null}).sort({sort: 1});
         }
+    } else {
+        subCategory = await Category.find({parent: null}).sort({sort: 1});
     }
 
     res.render('category/catalog', {
