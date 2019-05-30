@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title><%= title %></title>
+    <!--[if IE]>
+    <meta http-equiv='X-UA-Compatible', content="IE = edge" />
+    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" type='text/css' href="/stylesheets/style.css">
+</head>
+</html>
+<body>
+<div class="wrapper">
+    <%- include('../modules/header'); -%>
+    <section class="page">
+        <div class="container">
+            <ul class="breadcrumb">
+                <li><a href="/">Главная</a></li>
+                <%- breadcrumb %>
+            </ul>
+        </div>
+        <div class="catalog">
+            <div class="container">
+                <div class="catalog-container">
+                    <div class="filter">
+                        <div class="filter-catalog">
+                            <a href="javascript:;" class="filter-catalog-open">
+                                <div class="filter-catalog-container">
+                                    <div class="filter-catalog-container-text">
+                                        <% if (parent) { %>
+                                            <%= parent.name %>
+                                        <% } else { %>
+                                            Каталог товаров
+                                        <% } %>
+                                    </div>
+                                    <div class="filter-catalog-container-burger">
+                                            <span class="catalog-burger">
+                                                <span></span>
+                                            </span>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="filter-categories">
+                            <div class="side side-hidden">
+                                <ul class="menu">
+                                    <% mainCategory.forEach(function(category) { %>
+                                        <% if (!parent) { %>
+                                            <li><a href="/catalog/<%= category.slug %>"><%= category.name %></a></li>
+                                        <% } else if (String(parent._id) !== String(category._id)) { %>
+                                            <li><a href="/catalog/<%= category.slug %>"><%= category.name %></a></li>
+                                        <% } %>
+                                    <% }); %>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="filter-blocks">
+                            <div class="filter-category filter-block">
+                                <div class="filter-block-name">
+                                    <div class="filter-block-name-caption">Категории</div>
+                                    <div class="filter-block-name-icon"><span class="toggle"></span></div>
+                                </div>
+                                <div class="filter-block-content">
+                                    <% subCategory.forEach(function(category) { %>
+                                        <div class="checkbox"><%= category.name %> <span>(<%= category.productsCount %>)</span></div>
+                                    <% }); %>
+                                </div>
+                            </div>
+                            <div class="filter-price filter-block">
+                                <div class="filter-block-name">
+                                    <div class="filter-block-name-caption">Цена</div>
+                                    <div class="filter-block-name-icon"><span class="toggle"></span></div>
+                                </div>
+                                <div class="filter-block-content">
+                                    <div class="filter-block-content-inputs">
+                                        <div class="ranger-input">
+                                            <input type="text" value="0 грн." name="range-min" inputmode="numeric" maxlength="8">
+                                        </div>
+                                        <div class="ranger-separator"><span></span></div>
+                                        <div class="ranger-input">
+                                            <input type="text" value="5000 грн." name="range-max" inputmode="numeric" maxlength="8">
+                                        </div>
+                                    </div>
+                                    <div class="filter-block-content-ranger">
+                                        <div class="ranger"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="filter-tags filter-block">
+                                <div class="filter-block-name">
+                                    <div class="filter-block-name-caption">Теги</div>
+                                    <div class="filter-block-name-icon"><span class="toggle"></span></div>
+                                </div>
+                                <div class="filter-block-content">
+                                    <div class="filter-tags-container">
+                                        <span class="discount">скидка</span>
+                                        <span class="bestseller">хит продаж</span>
+                                        <span class="new">новинка</span>
+                                        <span class="premium">премиум</span>
+                                        <span class="only">только у нас</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="filter-brand filter-block">
+                                <div class="filter-block-name">
+                                    <div class="filter-block-name-caption">Бренд</div>
+                                    <div class="filter-block-name-icon"><span class="toggle"></span></div>
+                                </div>
+                                <div class="filter-block-content">
+                                    <div class="checkbox">Adrien Lastic</div>
+                                    <div class="checkbox">Alive</div>
+                                    <div class="checkbox">Big Teaze Toys</div>
+                                    <div class="checkbox">BKK</div>
+                                    <div class="checkbox">Blow Yo</div>
+                                    <div class="checkbox">Big Teaze Toys</div>
+                                    <div class="checkbox">BKK</div>
+                                    <div class="checkbox">Blow Yo</div>
+                                </div>
+                            </div>
+                            <div class="filter-country filter-block">
+                                <div class="filter-block-name">
+                                    <div class="filter-block-name-caption">Cтрана производитель</div>
+                                    <div class="filter-block-name-icon"><span class="toggle"></span></div>
+                                </div>
+                                <div class="filter-block-content">
+                                    <div class="checkbox">Европа</div>
+                                    <div class="checkbox">Канада</div>
+                                    <div class="checkbox">Лондон</div>
+                                    <div class="checkbox">Италия</div>
+                                    <div class="checkbox">Германия</div>
+                                    <div class="checkbox">Франция</div>
+                                    <div class="checkbox">Китай</div>
+                                    <div class="checkbox">США</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="list">
+                        <div class="list-caption-container">
+                            <div class="list-caption-container-text">
+                                <h1><%= title %></h1>
+                            </div>
+                            <div class="list-caption-container-sort">
+                                <ul>
+                                    <li>Сортировать по:</li>
+                                    <li><a href="javascript:;" class="active">Рейтингу</a></li>
+                                    <li><a href="javascript:;"> Новые </a></li>
+                                    <li><a href="javascript:;"> Дешевые </a></li>
+                                    <li><a href="javascript:;"> Дорогие </a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="list-products-container">
+                            <div class="cell">
+                                <div class="cell-category">
+                                    <div class="cell-category-name">Лубриканты</div>
+                                    <div><span class="add-to-favorite"></span></div>
+                                </div>
+                                <div class="cell-image">
+                                    <img src="/uploads/products/thumbnails/5ce97089a147d31144a9cb2f.jpg" alt="">
+                                </div>
+                                <div class="cell-price">
+                                    <div class="cell-price-main">500 грн.</div>
+                                    <div class="cell-price-old"></div>
+                                </div>
+                                <div class="cell-name">
+                                    Лубрикант на силиконовой основе Silc glide, 100 мл
+                                </div>
+                                <div class="cell-tags">
+                                    <span class="new">новинка</span>
+                                </div>
+                            </div>
+
+                            <div class="cell">
+                                <div class="cell-category">
+                                    <div class="cell-category-name">Фаллоимитаторы для взрослых игр</div>
+                                    <div><span class="add-to-favorite"></span></div>
+                                </div>
+                                <div class="cell-image">
+                                    <img src="/uploads/products/thumbnails/5ce97089a147d31144a9cb2b.jpg" alt="">
+                                </div>
+                                <div class="cell-price">
+                                    <div class="cell-price-main">1250 грн.</div>
+                                    <div class="cell-price-old"></div>
+                                </div>
+                                <div class="cell-name">
+                                    Пульсатор для женщин Fun Factory Stronic Drei
+                                </div>
+                                <div class="cell-tags">
+                                    <span class="new">новинка</span>
+                                </div>
+                            </div>
+
+                            <div class="cell">
+                                <div class="cell-category">
+                                    <div class="cell-category-name">Лубриканты</div>
+                                    <div><span class="add-to-favorite"></span></div>
+                                </div>
+                                <div class="cell-image">
+                                    <img src="/uploads/products/thumbnails/5ce97089a147d31144a9cb2d.jpg" alt="">
+                                </div>
+                                <div class="cell-price">
+                                    <div class="cell-price-main discount">860 грн.</div>
+                                    <div class="cell-price-old">1000 грн.</div>
+                                </div>
+                                <div class="cell-name">
+                                    Анатомический вибратор для обоих партнёров Gpop партнёров Gpop  - Gvibe
+                                </div>
+                                <div class="cell-tags">
+                                    <span class="discount">скидка</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+<script src="/plugins/imask/imask.js"></script>
+<script src="/javascripts/main.js"></script>
+<script src="/javascripts/filter.js"></script>
+</body>
+</html>

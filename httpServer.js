@@ -9,8 +9,9 @@ const session = require('express-session');
 const authController = require('controllers/backend/auth');
 
 const indexRouter = require('./routes/index');
-const usersRouter = require('./routes/users');
-const backendRouter = require('./routes/backend');
+const categoryRouter = require('./routes/category');
+// const usersRouter = require('./routes/users');
+// const backendRouter = require('./routes/backend');
 const backendCountryRouter = require('./routes/backend/country');
 const backendBrandRouter = require('./routes/backend/brand');
 const backendCategoryRouter = require('./routes/backend/category');
@@ -53,10 +54,10 @@ app.use(authController.getUserFromDatabaseBySessionUserId);
 
 // Routes prefix
 app.use('/', indexRouter);
-app.use('/users', usersRouter);
+app.use('/catalog', categoryRouter);
 
 // Backend routes prefix
-app.use('/backend', backendRouter);
+// app.use('/backend', backendRouter);
 app.use('/backend/country', backendCountryRouter);
 app.use('/backend/brand', backendBrandRouter);
 app.use('/backend/category', backendCategoryRouter);

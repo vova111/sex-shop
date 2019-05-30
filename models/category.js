@@ -2,6 +2,8 @@ const mongoose = require('mongoose');
 const mongoosePaginator = require('mongoose-paginator-simple');
 const arrayToTree = require('array-to-tree');
 const Product = require('models/product');
+let menuHtmlCache;
+let mainMenu;
 
 const Schema = mongoose.Schema;
 
@@ -114,19 +116,46 @@ categorySchema.statics.hasSubCategory = async function ($categoryId) {
     return hasSubCat !== null;
 };
 
+categorySchema.statics.getCategoryTreeHtmlFromCache = async function () {
+    if (!menuHtmlCache) {
+        await generateCategoryTreeHtmlCache();
+    }
+
+    return menuHtmlCache;
+};
+
+categorySchema.statics.getMainCategoryCache = async function () {
+    if (!mainMenu) {
+        await generateMainCategoryCache();
+    }
+
+    return mainMenu;
+};
+
 categorySchema.pre('save', function(next) {
-    if (this.isModified('parent')) {
-        this.wasParentModified = true;
-        console.log('modif1');
+    if (this.isNew) {
+        this.wasNew = this.isNew;
+    } else {
+        if (this.isModified('parent')) {
+            this.wasParentModified = true;
+        }
     }
 
     next();
 });
 
-categorySchema.post('save', function(doc, next) {
-    if (this.wasParentModified) {
-        console.log('modif2');
+categorySchema.post('save', async function(category, next) {
+    if (this.wasNew) {
+
+    } else {
+        if (this.wasParentModified) {
+            await updateCategoriesInAllProducts();
+            await Category.updateProductCountCache();
+        }
     }
+
+    await generateCategoryTreeHtmlCache();
+    await generateMainCategoryCache();
 
     next();
 });
@@ -139,6 +168,119 @@ const prepareTree = async (fields = 'id name parent', where = {}) => {
         parentProperty: 'parent',
         customID: '_id'
     });
+};
+
+const updateCategoriesInAllProducts = async function () {
+    const category = await Category.find({}).select('id parent').lean();
+    const categoryMap = new Map();
+
+    for (let i = 0; i < category.length; i++) {
+        const parent = category[i].parent ? category[i].parent.toString() : null;
+        categoryMap.set(category[i]._id.toString(), parent);
+    }
+
+    const changeProductCategories = async () => {
+        let product;
+        const cursor = Product.find({}).select('id category').cursor({batchSize: 500});
+
+        const fromObjectToString = (categories) => {
+            const strArray = [];
+
+            for (let i = 0; i < categories.length; i++) {
+                strArray.push(categories[i].toString());
+            }
+
+            return strArray;
+        };
+
+        const getSubCategories = (categories) => {
+            const subCategories = [];
+
+            for (let i = 0; i < categories.length; i++) {
+                const parent = categoryMap.get(categories[i]);
+
+                if (parent) {
+                    subCategories.push(categories[i]);
+                }
+            }
+
+            return subCategories;
+        };
+
+        const getAllCategoriesWithParents = (categories) => {
+            const parents = [];
+
+            for (let i = 0; i < categories.length; i++) {
+                const parent = categoryMap.get(categories[i]);
+
+                if (parents.indexOf(parent) === -1) {
+                    parents.push(parent);
+                }
+            }
+
+            return parents.concat(categories);
+        };
+
+        const compareCategories = (newCategories, oldCategories) => {
+            if (newCategories.length !== oldCategories.length) {
+                return false;
+            } else {
+                for (let i = 0; i < newCategories.length; i++) {
+                    if (oldCategories.indexOf(newCategories[i]) === -1) {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
+        };
+
+        while ((product = await cursor.next())) {
+            const productCategories = fromObjectToString(product.category);
+            const subCategories = getSubCategories(productCategories);
+            const allCategories = getAllCategoriesWithParents(subCategories);
+
+            if (!compareCategories(allCategories, productCategories)) {
+                await Product.updateOne({ _id: product._id }, { category: allCategories });
+            }
+        }
+    };
+
+    await changeProductCategories();
+};
+
+const generateCategoryTreeHtmlCache = async () => {
+    const categories = await prepareTree('id name parent slug');
+
+    const buildMenu = (categories, ulClass, url) => {
+        let menuHtml = `<ul class="${ulClass}">`;
+
+        for (let category of categories) {
+            let liClass = '';
+
+            if (typeof(category.children) !== 'undefined') {
+                liClass = ' class="menu__list"';
+            }
+
+            menuHtml += `<li${liClass}><a href="/catalog${url}${category.slug}">${category.name}</a>`;
+
+            if (typeof(category.children) !== 'undefined') {
+                menuHtml += buildMenu(category.children, 'menu__drop', `/${category.slug}/`);
+            }
+
+            menuHtml += '</li>';
+        }
+
+        menuHtml += '</ul>';
+
+        return menuHtml;
+    };
+
+    menuHtmlCache = buildMenu(categories, 'menu', '/');
+};
+
+const generateMainCategoryCache = async () => {
+    mainMenu = await Category.find({parent: null}).select('id name slug').sort({sort: 1}).lean();
 };
 
 const Category = mongoose.model('Category', categorySchema);

@@ -1,4 +1,5 @@
 const Category = require('models/category');
+const Product = require('models/product');
 const CategoryJsonSchema = require('schemes/category');
 const Ajv = require('ajv/lib/ajv');
 const pagination = require('classes/boostrapPaginator');
@@ -166,8 +167,19 @@ const getSlug = (req, res, next) => {
 
 const canDelete = async (req, res, next) => {
     try {
-        const count = await Category.countDocuments({parent: req.body.id});
-        const message = !count ? '' : 'Вы не можете удалить эту категорию, так как она содержит вложенные подкатегории!';
+        let count = await Category.countDocuments({parent: req.body.id});
+        let message = '';
+
+        if (!count) {
+            const hasProduct = await Product.findOne({category: {$in: req.body.id}}).lean();
+
+            if (hasProduct) {
+                count = 1;
+                message = 'Вы не можете удалить эту категорию, так как в ней находятся продукты!';
+            }
+        } else {
+            message = 'Вы не можете удалить эту категорию, так как она содержит вложенные подкатегории!';
+        }
 
         res.json({status: true, count: count, message: message});
     } catch (error) {
