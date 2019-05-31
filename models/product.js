@@ -173,6 +173,14 @@ productSchema.statics.getObjectId = function() {
     return mongoose.Types.ObjectId();
 };
 
+productSchema.statics.getFormattedPrice = function(price) {
+    if (price % 100 > 0) {
+        return (price / 100).toFixed(2);
+    }
+
+    return price / 100;
+};
+
 productSchema.pre('save', async function (next) {
     this.cost.mainCost *= 100;
     this.cost.discountCost = this.cost.discountCost ? this.cost.discountCost * 100 : 0;

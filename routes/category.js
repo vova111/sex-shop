@@ -7,4 +7,6 @@ router.get('/', categoryController.showCategory);
 router.get('/:slug', categoryController.showCategory);
 router.get('/:parent/:slug', categoryController.showCategory);
 
+router.post('/filter', categoryController.filterProducts);
+
 module.exports = router;

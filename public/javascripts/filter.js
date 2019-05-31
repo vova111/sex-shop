@@ -24,6 +24,95 @@ const enableAllFilters = (container) => {
     }
 };
 
+const rebuildFilters = (container, brands, countries) => {
+    return new Promise((resolve, reject) => {
+        const pasteCheckboxes = (selector, entities) => {
+            const content = container.querySelector(selector);
+
+            removeAllNodes(content);
+
+            for (let entity of entities) {
+                const checkbox = document.createElement('div');
+                const checkboxText = document.createTextNode(entity.name);
+
+                checkbox.classList.add('checkbox');
+
+                if (typeof entity.selected !== 'undefined') {
+                    checkbox.classList.add('checked');
+                }
+
+                checkbox.dataset.item = entity.id;
+                checkbox.appendChild(checkboxText);
+
+                content.appendChild(checkbox);
+            }
+        };
+
+        pasteCheckboxes('.filter-brand .filter-block-content', brands);
+        pasteCheckboxes('.filter-country .filter-block-content', countries);
+
+        enableAllFilters(container);
+    });
+};
+
+const filterProducts = (container) => {
+    disableAllFilters(container);
+
+    const collectCheckboxes = (selector, isCategory = false) => {
+        const checkboxes = container.querySelectorAll(selector);
+        const collection = [];
+
+        for (let checkbox of checkboxes) {
+            if (checkbox.classList.contains('checked')) {
+                collection.push(checkbox.dataset.item);
+            }
+        }
+
+        if (isCategory && !collection.length) {
+            for (let checkbox of checkboxes) {
+                collection.push(checkbox.dataset.item);
+            }
+        }
+
+        return collection;
+    };
+
+    const getPrice = (selector) => {
+        const field = container.querySelector(selector);
+        const limit = parseInt(field.dataset.limit);
+        const value = parseInt(field.value);
+
+        return limit !== value ? value : false;
+    };
+
+    const getSort = () => {
+        const sort = document.querySelector('.list-caption-container ul li a.active');
+        return sort.dataset.item;
+    };
+
+    const categories = collectCheckboxes('.filter-category .checkbox', true);
+    const brands = collectCheckboxes('.filter-brand .checkbox');
+    const countries = collectCheckboxes('.filter-country .checkbox');
+
+    const price = {
+        min: getPrice('.filter-price input[name="range-min"]'),
+        max: getPrice('.filter-price input[name="range-max"]')
+    };
+
+    const sort = getSort();
+    const page = 1;
+
+    axios.post('/catalog/filter', {
+            categories, brands, countries, price, sort, page
+        })
+        .then((response) => {
+            return rebuildFilters(container, response.data.brands, response.data.countries);
+        })
+        .catch((error) => {
+            alert('Неизвестная ошибка! Перезагрузите страницу.');
+        });
+};
+
 document.addEventListener('DOMContentLoaded', () => {
     const filterContainer = document.querySelector('.filter');
     const finterCatalogButton = filterContainer.querySelector('.filter-catalog-open');
@@ -52,6 +141,8 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 target.classList.remove('checked');
             }
+
+            filterProducts(filterContainer);
         }
     });
 
@@ -191,6 +282,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         slideMin.addEventListener("mouseup", function(e){
             range.minDragged = false;
+            filterProducts(filterContainer);
         });
 
         /* set Max slide Listener */
@@ -200,6 +292,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         slideMax.addEventListener("mouseup", function(e){
             range.maxDragged = false;
+            filterProducts(filterContainer);
         });
 
         /* default unset */

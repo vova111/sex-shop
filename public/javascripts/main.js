@@ -1,3 +1,9 @@
+const removeAllNodes = (node) => {
+    while (node.firstChild) {
+        node.firstChild.remove();
+    }
+};
+
 document.addEventListener('DOMContentLoaded', () => {
     const page = document.querySelector('.page');
     const catalogButton = document.querySelector('.catalog-open');

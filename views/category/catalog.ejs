@@ -66,12 +66,12 @@
                                     <% subCategory.forEach(function(sub) { %>
                                         <% if (category) { %>
                                             <% if (category.id === sub.id) { %>
-                                                <div class="checkbox checked" data-category="<%= sub.id %>"><%= sub.name %> <span>(<%= sub.productsCount %>)</span></div>
+                                                <div class="checkbox checked" data-item="<%= sub.id %>"><%= sub.name %> <span>(<%= sub.productsCount %>)</span></div>
                                             <% } else { %>
-                                                <div class="checkbox" data-category="<%= sub.id %>"><%= sub.name %> <span>(<%= sub.productsCount %>)</span></div>
+                                                <div class="checkbox" data-item="<%= sub.id %>"><%= sub.name %> <span>(<%= sub.productsCount %>)</span></div>
                                             <% } %>
                                         <% } else { %>
-                                                <div class="checkbox" data-category="<%= sub.id %>"><%= sub.name %> <span>(<%= sub.productsCount %>)</span></div>
+                                                <div class="checkbox" data-item="<%= sub.id %>"><%= sub.name %> <span>(<%= sub.productsCount %>)</span></div>
                                         <% } %>
                                     <% }); %>
                                 </div>
@@ -84,11 +84,11 @@
                                 <div class="filter-block-content">
                                     <div class="filter-block-content-inputs">
                                         <div class="ranger-input">
-                                            <input type="text" value="0 грн." name="range-min" inputmode="numeric" maxlength="8">
+                                            <input type="text" value="0 грн." data-limit="0" name="range-min" inputmode="numeric" maxlength="8">
                                         </div>
                                         <div class="ranger-separator"><span></span></div>
                                         <div class="ranger-input">
-                                            <input type="text" value="5000 грн." name="range-max" inputmode="numeric" maxlength="8">
+                                            <input type="text" value="<%= maxPrice %> грн." data-limit="<%= maxPrice %>" name="range-max" inputmode="numeric" maxlength="8">
                                         </div>
                                     </div>
                                     <div class="filter-block-content-ranger">
@@ -117,14 +117,13 @@
                                     <div class="filter-block-name-icon"><span class="toggle"></span></div>
                                 </div>
                                 <div class="filter-block-content">
-                                    <div class="checkbox">Adrien Lastic</div>
-                                    <div class="checkbox">Alive</div>
-                                    <div class="checkbox">Big Teaze Toys</div>
-                                    <div class="checkbox">BKK</div>
-                                    <div class="checkbox">Blow Yo</div>
-                                    <div class="checkbox">Big Teaze Toys</div>
-                                    <div class="checkbox">BKK</div>
-                                    <div class="checkbox">Blow Yo</div>
+                                    <% brands.forEach(function(brand) { %>
+                                        <% if (brand.selected) { %>
+                                            <div class="checkbox checked" data-item="<%= brand.id %>"><%= brand.name %></div>
+                                        <% } else { %>
+                                            <div class="checkbox" data-item="<%= brand.id %>"><%= brand.name %></div>
+                                        <% } %>
+                                    <% }); %>
                                 </div>
                             </div>
                             <div class="filter-country filter-block">
@@ -133,14 +132,13 @@
                                     <div class="filter-block-name-icon"><span class="toggle"></span></div>
                                 </div>
                                 <div class="filter-block-content">
-                                    <div class="checkbox">Европа</div>
-                                    <div class="checkbox">Канада</div>
-                                    <div class="checkbox">Лондон</div>
-                                    <div class="checkbox">Италия</div>
-                                    <div class="checkbox">Германия</div>
-                                    <div class="checkbox">Франция</div>
-                                    <div class="checkbox">Китай</div>
-                                    <div class="checkbox">США</div>
+                                    <% countries.forEach(function(country) { %>
+                                        <% if (country.selected) { %>
+                                            <div class="checkbox checked" data-item="<%= country.id %>"><%= country.name %></div>
+                                        <% } else { %>
+                                            <div class="checkbox" data-item="<%= country.id %>"><%= country.name %></div>
+                                        <% } %>
+                                    <% }); %>
                                 </div>
                             </div>
                         </div>
@@ -153,10 +151,10 @@
                             <div class="list-caption-container-sort">
                                 <ul>
                                     <li>Сортировать по:</li>
-                                    <li><a href="javascript:;" class="active">Рейтингу</a></li>
-                                    <li><a href="javascript:;"> Новые </a></li>
-                                    <li><a href="javascript:;"> Дешевые </a></li>
-                                    <li><a href="javascript:;"> Дорогие </a></li>
+                                    <li><a href="javascript:;" data-item="rating" class="active">Рейтингу</a></li>
+                                    <li><a href="javascript:;" data-item="new">Новые</a></li>
+                                    <li><a href="javascript:;" data-item="cheap">Дешевые</a></li>
+                                    <li><a href="javascript:;" data-item="expensive">Дорогие</a></li>
                                 </ul>
                             </div>
                         </div>
@@ -228,6 +226,7 @@
     </section>
 </div>
 <script src="/plugins/imask/imask.js"></script>
+<script src="/plugins/axios/axios.min.js"></script>
 <script src="/javascripts/main.js"></script>
 <script src="/javascripts/filter.js"></script>
 </body>

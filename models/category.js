@@ -280,7 +280,7 @@ const generateCategoryTreeHtmlCache = async () => {
 };
 
 const generateMainCategoryCache = async () => {
-    mainMenu = await Category.find({parent: null}).select('id name slug').sort({sort: 1}).lean();
+    mainMenu = await Category.find({parent: null}).sort({sort: 1}).lean();
 };
 
 const Category = mongoose.model('Category', categorySchema);
