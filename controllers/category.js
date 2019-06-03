@@ -10,6 +10,7 @@ const showCategory = async (req, res, next) => {
     let whereCategory;
     const slug = req.params.slug;
     const breadcrumbStart = {url: '/catalog', title: title};
+    const limit = 12;
 
     if (slug) {
         category = await Category.findOne({slug: slug}).populate('parent');
@@ -40,12 +41,16 @@ const showCategory = async (req, res, next) => {
         });
     }
 
-    const products = await Product.find({ category: { $in: whereCategory } }).limit(12);
+    const products = await Product.find({ category: { $in: whereCategory } })
+        .select('id cost name mainCategory slug photos isBestseller isPremium isOnlyHere')
+        .populate('mainCategory', 'name')
+        .sort({ rating: -1 })
+        .limit(limit);
 
     res.render('category/catalog', {
         title: title,
         headerCatalog: await Category.getCategoryTreeHtmlFromCache(),
-        breadcrumb: generateBreadcrumb(breadcrumbStart, category),
+        breadcrumb: Category.generateBreadcrumb(breadcrumbStart, category),
         mainCategory: await Category.getMainCategoryCache(),
         category: category,
         parent: parent,
@@ -103,44 +108,44 @@ const filterProducts = async (req, res, next) => {
     }
 
     if (price.min) {
-        where['cost.mainCost'] = { $gte: price.min }
+        where['cost.currentCost'] = { $gte: price.min }
     }
 
     if (price.max) {
-        where['cost.mainCost'] = { $lte: price.max }
+        where['cost.currentCost'] = { $lte: price.max }
     }
 
-    const products = await Product.find(where).select('id cost name slug photos').lean();
+    let order;
+
+    switch (sort) {
+        case 'rating':
+            order = { rating: -1 };
+            break;
+        case 'new':
+            order = { createdAt: -1 };
+            break;
+        case 'cheap':
+            order = { 'cost.currentCost': 1 };
+            break;
+        case 'expensive':
+            order = { 'cost.currentCost': -1 };
+            break;
+        default:
+            order = { rating: -1 };
+            break;
+    }
+
+    const limit = 12;
+
+    const products = await Product.find(where)
+        .select('id cost name mainCategory slug photos isBestseller isPremium isOnlyHere')
+        .populate('mainCategory', 'name')
+        .sort(order)
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .lean();
 
     res.json({ products, brands: newBrands, countries: newCountries, page });
-};
-
-const generateBreadcrumb = (start, category) => {
-    const breadcrumb = [start];
-
-    if (category) {
-        if (category.parent) {
-            breadcrumb.push({url: `/${category.parent.slug}`, title: category.parent.name});
-        }
-
-        breadcrumb.push({url: `/${category.slug}`, title: category.name});
-    }
-
-    let url = '';
-    let html = '';
-
-    for (let i = 0; i < breadcrumb.length; i++) {
-        const isLast = ((breadcrumb.length - 1) === i);
-        url += breadcrumb[i].url;
-
-        if (!isLast) {
-            html += `<li><a href="${url}">${breadcrumb[i].title}</a></li>`;
-        } else {
-            html += `<li class="active">${breadcrumb[i].title}</li>`;
-        }
-    }
-
-    return html;
 };
 
 const getMaxPrice = async (category) => {
@@ -149,20 +154,9 @@ const getMaxPrice = async (category) => {
             category: { $in: category }
         }
     }, {
-        $project: {
-            _id: false,
-            price: {
-                $cond: {
-                    if: { $eq: ["$cost.isDiscount", false] },
-                    then: "$cost.mainCost",
-                    else: "$cost.discountCost"
-                }
-            }
-        }
-    }, {
         $group: {
             _id: null,
-            max: { $max: "$price" }
+            max: { $max: "$cost.currentCost" }
         }
     }];
 
@@ -174,7 +168,8 @@ const getMaxPrice = async (category) => {
 const getBrands = async (category, selected = []) => {
     const aggregatorOpts = [{
         $match: {
-            category: { $in: category }
+            category: { $in: category },
+            brand: { $ne: null }
         }
     }, {
         $group: {
@@ -220,7 +215,8 @@ const getBrands = async (category, selected = []) => {
 const getCountry = async (category, selected = []) => {
     const aggregatorOpts = [{
         $match: {
-            category: { $in: category }
+            category: { $in: category },
+            country: { $ne: null }
         }
     }, {
         $group: {

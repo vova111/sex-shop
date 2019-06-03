@@ -90,15 +90,14 @@
                         </div>
                         <div class="col-lg-6">
                             <div class="form-group">
-                                <label>Продавец: </label>
-                                <select name="seller">
-                                    <% if (data.seller) { %>
-                                        <option value="<%= data.seller.id %>" selected><%= data.seller.name %></option>
-                                    <% } else { %>
+                                <div class="form-group">
+                                    <label>Основная категория в которой находится товар: <span class="text-danger">*</span></label>
+                                    <select name="main">
                                         <option value="">отсутствует</option>
-                                    <% } %>
-                                </select>
-                                <p class="help-block">Выберите продавца товара.</p>
+                                        <%- mainCategories %>
+                                    </select>
+                                    <p class="help-block">Выберите одну основную категорию для товара. ( Это поле обязательное. )</p>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -148,12 +147,65 @@
                         </div>
                         <div class="col-lg-6">
                             <div class="form-group">
+                                <label>Продавец: </label>
+                                <select name="seller">
+                                    <option value="">отсутствует</option>
+                                </select>
+                                <p class="help-block">Выберите продавца товара.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="form-group">
                                 <label>В наличии</label>
                                 <div class="checkbox">
                                     <label>
                                         <input type="checkbox" name="stock" <% if (data.inStock) { %> checked <% } %>> Этот товар есть на складе
                                     </label>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="form-group">
+                                <label>Премиум</label>
+                                <div class="checkbox">
+                                    <label>
+                                        <input type="checkbox" name="premium" <% if (data.isPremium) { %> checked <% } %>> Этот премиум товар
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="form-group">
+                                <label>Только у нас</label>
+                                <div class="checkbox">
+                                    <label>
+                                        <input type="checkbox" name="only" <% if (data.isOnlyHere) { %> checked <% } %>> Этот товар есть только у нас
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <h3 class="page-header">Аттрибуты товара</h3>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label>Доступные цвета: </label>
+                                <select name="colors[]" multiple>
+                                    <% colors.forEach(function(color) { %>
+                                        <% if (data.colors.indexOf(color.id) !== -1) { %>
+                                            <option class="<%= color.class %>" value="<%= color.id %>" selected><%= color.name %></option>
+                                        <% } else { %>
+                                            <option class="<%= color.class %>" value="<%= color.id %>"><%= color.name %></option>
+                                        <% } %>
+                                    <% }); %>
+                                </select>
+                                <p class="help-block">Выберите цвет товара, который есть в наличии.</p>
                             </div>
                         </div>
                     </div>

@@ -46,6 +46,10 @@ const productSchema = new Schema({
             default: false,
             index: true
         },
+        currentCost: {
+            type: Schema.Types.Number,
+            default: 0
+        }
     },
     description: {
         short: {
@@ -62,6 +66,9 @@ const productSchema = new Schema({
         of: String,
         default: null
     },
+    colors: [
+        Schema.Types.ObjectId
+    ],
     country: {
         type: Schema.Types.ObjectId,
         ref: 'Country',
@@ -83,8 +90,34 @@ const productSchema = new Schema({
     category: [
         Schema.Types.ObjectId
     ],
+    mainCategory: {
+        type: Schema.Types.ObjectId,
+        ref: 'Category',
+        default: null,
+        index: true
+    },
     photos: {
         type: [productImageSchema]
+    },
+    isPremium: {
+        type: Schema.Types.Boolean,
+        default: false,
+        index: true
+    },
+    isOnlyHere: {
+        type: Schema.Types.Boolean,
+        default: false,
+        index: true
+    },
+    isBestseller: {
+        type: Schema.Types.Boolean,
+        default: false,
+        index: true
+    },
+    rating: {
+        type: Schema.Types.Number,
+        default: 0,
+        index: true
     }
 }, {
     timestamps: true
@@ -181,16 +214,43 @@ productSchema.statics.getFormattedPrice = function(price) {
     return price / 100;
 };
 
+productSchema.methods.getPrice = function() {
+    return Product.getFormattedPrice(this.cost.currentCost);
+};
+
+productSchema.methods.getOriginalPrice = function() {
+    return Product.getFormattedPrice(this.cost.mainCost);
+};
+
+productSchema.methods.getDiscountPercentage = function() {
+    return Math.round((this.cost.mainCost - this.cost.discountCost) / this.cost.mainCost * 100);
+};
+
+productSchema.methods.getMainImage = function(thuml = true) {
+    let image;
+
+    for (let i = 0; i < this.photos.length; i++) {
+        if (this.photos[i].isMain) {
+            image = this.photos[i].name;
+            break;
+        }
+    }
+
+    return thuml ? `${productThumbImgUrl}${image}` : `${productImgUrl}${image}`;
+};
+
 productSchema.pre('save', async function (next) {
     this.cost.mainCost *= 100;
-    this.cost.discountCost = this.cost.discountCost ? this.cost.discountCost * 100 : 0;
+
+    if (this.cost.discountCost) {
+        this.cost.discountCost =  this.cost.discountCost * 100;
+        this.cost.currentCost = this.cost.discountCost;
+    } else {
+        this.cost.discountCost = 0;
+        this.cost.currentCost = this.cost.mainCost;
+    }
 
     this.cost.isDiscount = !!this.cost.discountCost;
-
-    // if (this.isModified('category')) {
-    //     console.log('modif', this.category, Category);
-    //
-    // }
 
     next();
 });

@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title><%= product.name %></title>
+    <!--[if IE]>
+    <meta http-equiv='X-UA-Compatible', content="IE = edge" />
+    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" type='text/css' href="/plugins/tippy/css/light-border.css">
+    <link rel="stylesheet" type='text/css' href="/stylesheets/style.css">
+</head>
+</html>
+<body>
+<div class="wrapper">
+    <%- include('../modules/header'); -%>
+    <section class="page">
+        <div class="container">
+            <ul class="breadcrumb">
+                <li><a href="/">Главная</a></li>
+                <%- breadcrumb %>
+            </ul>
+        </div>
+        <div class="info">
+            <div class="container">
+                <div class="showcase">
+                    <div class="photos">
+                        <div class="photos-container">
+                            <div class="main-photo">
+                                <img src="<%= photos.url + photos.images[0].name %>" alt="<%= product.name %>">
+                            </div>
+                            <div class="thumbnails">
+                                <ul>
+                                    <% photos.images.forEach(function(photo) { %>
+                                        <li><a href="javascript:;"<%- photo.class %>><img src="<%= photos.url + photo.name %>" alt="<%= product.name %>" class="thumbnail"></a></li>
+                                    <% }); %>
+                                </ul>
+                            </div>
+                        </div>
+                        <% if (product.cost.isDiscount) { %>
+                            <div class="product-discount">-<%= product.getDiscountPercentage() %>%</div>
+                        <% } %>
+                    </div>
+                    <div class="attributes">
+                        <div class="attributes-container">
+                            <div class="tags">
+                                <% if (product.cost.isDiscount) { %>
+                                    <div><span class="tag discount">скидка</span></div>
+                                <% } %>
+                                <% if (product.isBestseller) { %>
+                                    <div><span class="tag bestseller">хит продаж</span></div>
+                                <% } %>
+                                <% if (product.isPremium) { %>
+                                    <div><span class="tag premium">премиум</span></div>
+                                <% } %>
+                                <% if (product.isOnlyHere) { %>
+                                    <div><span class="tag only">только у нас</span></div>
+                                <% } %>
+                                <div class="product-code">Код товара: <span><%= product.code %></span></div>
+                            </div>
+                            <div class="product-name">
+                                <h1><%= product.name %></h1>
+                            </div>
+                            <div class="stock">
+                                <% if (product.inStock) { %>
+                                    <span class="in-stock">В наличии</span>
+                                <% } else { %>
+                                    <span class="not-in-stock">Нет в наличии</span>
+                                <% } %>
+                            </div>
+                            <div class="starts-colors">
+                                <div class="stars">
+                                    <div class="rating rating<%= product.rating %>"></div>
+                                </div>
+                                <%
+                                    const colorNames = [];
+                                    if (product.inStock) {
+                                %>
+                                    <div class="colors">
+                                        <%
+                                            let counter = 0;
+
+                                            colors.forEach(function(color) {
+                                        %>
+                                            <% if (product.colors.indexOf(color.id) !== -1) { colorNames.push(color.name); %>
+                                                <% if (!counter) { counter++; %>
+                                                    <div data-color="<%= color.id %>" data-tippy-content="<%= color.name %>" class="product-color <%= color.class %> active"></div>
+                                                <% } else { %>
+                                                    <div data-color="<%= color.id %>" data-tippy-content="<%= color.name %>" class="product-color <%= color.class %>"></div>
+                                                <% } %>
+                                            <% } %>
+                                        <% }); %>
+                                    </div>
+                                <% } %>
+                            </div>
+                            <div class="price">
+                                <div class="main"><%= product.getPrice() %> грн.</div>
+                                <% if (product.cost.isDiscount) { %>
+                                    <div class="discount"><%= product.getOriginalPrice() %> грн.</div>
+                                <% } %>
+                            </div>
+                            <div class="buttons">
+                                <a href="javascript:;" class="add-to-basket">Добавить в корзину</a>
+                                <span class="add-to-favorite"></span>
+                            </div>
+                            <div class="short">
+                                <%- product.description.short %>
+                            </div>
+                            <div class="seller">
+                                <div class="caption">Продавец этого товара:</div>
+                                <% if(product.seller) { %>
+                                    <div class="logo"><img src="<%= product.seller.logoUrl %>" alt="<%= product.seller.name %>"></div>
+                                <% } else { %>
+                                    <div class="logo"><img src="/images/lureshop-seller.jpg" alt="Lureshop"></div>
+                                <% } %>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="tabs">
+            <div class="container">
+                <div class="tabs-captions">
+                    <div class="tabs-list">
+                        <a href="javascript:;" class="active">Описание и характеристики</a>
+                        <a href="javascript:;">Доставка товара</a>
+                        <a href="javascript:;">Отзывы (0)</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="description">
+            <div class="container">
+                <div class="tabs-content">
+                    <div class="text">
+                        <div class="full">
+                            <%- product.description.full.replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, '<br />') %>
+                        </div>
+                        <div class="specifications">
+                            <table>
+                                <% if (colorNames.length) { %>
+                                    <tr>
+                                        <td class="caption">Цвет:</td>
+                                        <td class="value"><%= colorNames.join(', ') %></td>
+                                    </tr>
+                                <% } %>
+                                <% for (let specification of product.specifications) { %>
+                                    <tr>
+                                        <td class="caption"><%= specification[0] %></td>
+                                        <td class="value"><%= specification[1] %></td>
+                                    </tr>
+                                <% } %>
+                                <% if (product.brand) { %>
+                                        <tr>
+                                            <td class="caption">Производитель:</td>
+                                            <td class="value"><%= product.brand.name %></td>
+                                        </tr>
+                                <% } %>
+                                <% if (product.country) { %>
+                                    <tr>
+                                        <td class="caption">Страна производитель:</td>
+                                        <td class="value"><%= product.country.name %></td>
+                                    </tr>
+                                <% } %>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+<script src="/plugins/popper/popper.min.js"></script>
+<script src="/plugins/tippy/tippy.min.js"></script>
+<script src="/javascripts/main.js"></script>
+<script src="/javascripts/product.js"></script>
+</body>
+</html>

@@ -43,7 +43,7 @@
             text-decoration: none;
             padding-bottom: 2px;
             border-bottom: 2px solid transparent;
-            &:hover {
+            &:hover, &.active {
               color: #7359BE;
               font-weight: bold;
               border-bottom: 2px solid #7359BE;
@@ -58,5 +58,9 @@
     flex-wrap: wrap;
     justify-content: space-between;
     align-items: stretch;
+    & > div {
+      flex: 0 0 32.3%;
+      margin-bottom: 13px;
+    }
   }
 }

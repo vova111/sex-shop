@@ -422,6 +422,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     message: "Категория товара обязательное поле"
                 },
             },
+            main: {
+                presence: {
+                    allowEmpty: false,
+                    message: "Основная категория товара обязательное поле"
+                },
+            },
             slug: {
                 presence: {
                     message: "Постоянная ссылка обязательное поле"
@@ -434,6 +440,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     pattern: "[a-z0-9]+(?:-[a-z0-9]+)*",
                     message: "Постоянная ссылка может состоять только из символов a-z, 0-9, '-' и не содержать пробелов"
                 }
+            },
+            'colors[]': {
+                presence: {
+                    allowEmpty: false,
+                    message: "Цвет товара обязательное поле"
+                },
             }
         };
 
@@ -581,6 +593,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     new SlimSelect({
         select: 'select[name="category[]"]',
+        searchPlaceholder: searchPlaceholder,
+        searchText: searchText,
+        placeholder: 'отсутствует'
+    });
+
+    new SlimSelect({
+        select: 'select[name="main"]',
+        searchPlaceholder: searchPlaceholder,
+        searchText: searchText,
+        placeholder: 'отсутствует'
+    });
+
+    new SlimSelect({
+        select: 'select[name="colors[]"]',
         searchPlaceholder: searchPlaceholder,
         searchText: searchText,
         placeholder: 'отсутствует'

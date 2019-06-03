@@ -171,6 +171,86 @@ body {
 
 }
 
+.product-color-black {
+    background-color: #000000;
+    color: #303030;
+}
+
+.product-color-white {
+    background-color: #FFFFFF;
+    color: #333333;
+}
+
+.product-color-red {
+    background-color: #FF0000;
+    color: #FFFFFF;
+}
+
+.product-color-blue {
+    background-color: #0000FF;
+    color: #FFFFFF;
+}
+
+.product-color-beige {
+    background-color: #F5F5DC;
+    color: #333333;
+}
+
+.product-color-deep-sky-blue {
+    background-color: #00BFFF;
+    color: #333333;
+}
+
+.product-color-pink {
+    background-color: #FC0FC0;
+    color: #FFFFFF;
+}
+
+.product-color-yellow {
+    background-color: #FFFF00;
+    color: #333333;
+}
+
+.product-color-brown {
+    background-color: #964B00;
+    color: #FFFFFF;
+}
+
+.product-color-gray {
+    background-color: #808080;
+    color: #FFFFFF;
+}
+
+.product-color-gold {
+    background-color: #FFD700;
+    color: #333333;
+}
+
+.product-color-green {
+    background-color: #00FF00;
+    color: #333333;
+}
+
+.product-color-camouflage-green {
+    background-color: #78866B;
+    color: #FFFFFF;
+}
+
+.product-color-lilac {
+    background-color: #C8A2C8;
+    color: #FFFFFF;
+}
+
+.product-color-lime {
+    background-color: #CCFF00;
+    color: #333333;
+}
+
+.product-color-purple{
+    background-color: #800080;
+    color: #FFFFFF;
+}
+
 /* Nav Messages */
 .messages-dropdown .dropdown-menu .message-preview .avatar,
 .messages-dropdown .dropdown-menu .message-preview .name,

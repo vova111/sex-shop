@@ -24,6 +24,45 @@ const enableAllFilters = (container) => {
     }
 };
 
+const rebuildProductsList = (productsContainer, products) => {
+    return new Promise((resolve, reject) => {
+        const createCell = (product) => {
+            const divCell = document.createElement('div');
+            const divCellImage = document.createElement('div');
+            const divCellPrice = document.createElement('div');
+            const divCellName = document.createElement('div');
+            const divCellTags = document.createElement('div');
+
+            const createCategory = () => {
+                const divCellCategory = document.createElement('div');
+                const divCellCategoryName = document.createElement('div');
+                const divCellCategoryNameText = document.createTextNode(product.mainCategory.name);
+                const div = document.createElement('div');
+                const span = document.createElement('span');
+
+                span.classList.add('add-to-favorite');
+                span.dataset.item = product._id;
+                divCellCategoryName.classList.add('cell-category-name');
+                divCellCategory.classList.add('cell-category');
+
+                div.appendChild(span);
+                divCellCategoryName.appendChild(divCellCategoryNameText);
+                divCellCategory.appendChild(divCellCategoryName);
+                divCellCategory.appendChild(div);
+                // console.log(div);
+                return divCellCategory;
+            };
+            console.log(createCategory());
+            divCell.appendChild(createCategory());
+        };
+
+        for (let i = 0; i < products.length; i++) {
+            createCell(products[i])
+            // productsContainer.appendChild(createCell(products[i]));
+        }
+    });
+};
+
 const rebuildFilters = (container, brands, countries) => {
     return new Promise((resolve, reject) => {
         const pasteCheckboxes = (selector, entities) => {
@@ -55,8 +94,9 @@ const rebuildFilters = (container, brands, countries) => {
     });
 };
 
-const filterProducts = (container) => {
+const filterProducts = (container, productsContainer) => {
     disableAllFilters(container);
+    removeAllNodes(productsContainer);
 
     const collectCheckboxes = (selector, isCategory = false) => {
         const checkboxes = container.querySelectorAll(selector);
@@ -106,7 +146,10 @@ const filterProducts = (container) => {
             categories, brands, countries, price, sort, page
         })
         .then((response) => {
-            return rebuildFilters(container, response.data.brands, response.data.countries);
+            return Promise.all([
+                rebuildFilters(container, response.data.brands, response.data.countries),
+                rebuildProductsList(productsContainer, response.data.products)
+            ]);
         })
         .catch((error) => {
             alert('Неизвестная ошибка! Перезагрузите страницу.');
@@ -118,6 +161,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const finterCatalogButton = filterContainer.querySelector('.filter-catalog-open');
     const finterCatalogContainer = filterContainer.querySelector('.side');
     const filterBlocks = document.querySelector('.filter-blocks');
+    const productsContainer = document.querySelector('.list-products-container');
 
     filterBlocks.addEventListener('click', (event) => {
         const target = event.target;
@@ -142,7 +186,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 target.classList.remove('checked');
             }
 
-            filterProducts(filterContainer);
+            filterProducts(filterContainer, productsContainer);
         }
     });
 
@@ -282,7 +326,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         slideMin.addEventListener("mouseup", function(e){
             range.minDragged = false;
-            filterProducts(filterContainer);
+            filterProducts(filterContainer, productsContainer);
         });
 
         /* set Max slide Listener */
@@ -292,7 +336,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         slideMax.addEventListener("mouseup", function(e){
             range.maxDragged = false;
-            filterProducts(filterContainer);
+            filterProducts(filterContainer, productsContainer);
         });
 
         /* default unset */

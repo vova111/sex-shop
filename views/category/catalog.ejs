@@ -159,65 +159,47 @@
                             </div>
                         </div>
                         <div class="list-products-container">
-                            <div class="cell">
-                                <div class="cell-category">
-                                    <div class="cell-category-name">Лубриканты</div>
-                                    <div><span class="add-to-favorite"></span></div>
+                            <% products.forEach(function(product) { %>
+                                <div class="cell">
+                                    <div class="cell-category">
+                                        <div class="cell-category-name"><%= product.mainCategory.name %></div>
+                                        <div><span class="add-to-favorite" data-item="<%= product.id %>"></span></div>
+                                    </div>
+                                    <div class="cell-image">
+                                        <a href="/product/<%= product.slug %>">
+                                            <img src="<%= product.getMainImage() %>" alt="<%= product.name %>">
+                                        </a>
+                                        <% if (product.cost.isDiscount) { %>
+                                            <div class="cell-discount">-<%= product.getDiscountPercentage() %>%</div>
+                                        <% } %>
+                                    </div>
+                                    <div class="cell-price">
+                                        <% if (!product.cost.isDiscount) { %>
+                                            <div class="cell-price-main"><%= product.getPrice() %> грн.</div>
+                                        <% } else { %>
+                                            <div class="cell-price-main discount"><%= product.getPrice() %> грн.</div>
+                                            <div class="cell-price-old"><%= product.getOriginalPrice() %> грн.</div>
+                                        <% } %>
+                                    </div>
+                                    <div class="cell-name">
+                                        <a href="/product/<%= product.slug %>"><%= product.name %></a>
+                                    </div>
+                                    <div class="cell-tags">
+                                        <% if (product.cost.isDiscount) { %>
+                                            <span class="discount">скидка</span>
+                                        <% } %>
+                                        <% if (product.isBestseller) { %>
+                                            <span class="bestseller">хит продаж</span>
+                                        <% } %>
+                                        <% if (product.isPremium) { %>
+                                            <span class="premium">премиум</span>
+                                        <% } %>
+                                        <% if (product.isOnlyHere) { %>
+                                            <span class="only">только у нас</span>
+                                        <% } %>
+                                    </div>
                                 </div>
-                                <div class="cell-image">
-                                    <img src="/uploads/products/thumbnails/5ce97089a147d31144a9cb2f.jpg" alt="">
-                                </div>
-                                <div class="cell-price">
-                                    <div class="cell-price-main">500 грн.</div>
-                                    <div class="cell-price-old"></div>
-                                </div>
-                                <div class="cell-name">
-                                    Лубрикант на силиконовой основе Silc glide, 100 мл
-                                </div>
-                                <div class="cell-tags">
-                                    <span class="new">новинка</span>
-                                </div>
-                            </div>
-
-                            <div class="cell">
-                                <div class="cell-category">
-                                    <div class="cell-category-name">Фаллоимитаторы для взрослых игр</div>
-                                    <div><span class="add-to-favorite"></span></div>
-                                </div>
-                                <div class="cell-image">
-                                    <img src="/uploads/products/thumbnails/5ce97089a147d31144a9cb2b.jpg" alt="">
-                                </div>
-                                <div class="cell-price">
-                                    <div class="cell-price-main">1250 грн.</div>
-                                    <div class="cell-price-old"></div>
-                                </div>
-                                <div class="cell-name">
-                                    Пульсатор для женщин Fun Factory Stronic Drei
-                                </div>
-                                <div class="cell-tags">
-                                    <span class="new">новинка</span>
-                                </div>
-                            </div>
-
-                            <div class="cell">
-                                <div class="cell-category">
-                                    <div class="cell-category-name">Лубриканты</div>
-                                    <div><span class="add-to-favorite"></span></div>
-                                </div>
-                                <div class="cell-image">
-                                    <img src="/uploads/products/thumbnails/5ce97089a147d31144a9cb2d.jpg" alt="">
-                                </div>
-                                <div class="cell-price">
-                                    <div class="cell-price-main discount">860 грн.</div>
-                                    <div class="cell-price-old">1000 грн.</div>
-                                </div>
-                                <div class="cell-name">
-                                    Анатомический вибратор для обоих партнёров Gpop партнёров Gpop  - Gvibe
-                                </div>
-                                <div class="cell-tags">
-                                    <span class="discount">скидка</span>
-                                </div>
-                            </div>
+                            <% }); %>
                         </div>
                     </div>
                 </div>

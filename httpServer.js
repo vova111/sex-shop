@@ -10,6 +10,7 @@ const authController = require('controllers/backend/auth');
 
 const indexRouter = require('./routes/index');
 const categoryRouter = require('./routes/category');
+const productRouter = require('./routes/product');
 // const usersRouter = require('./routes/users');
 // const backendRouter = require('./routes/backend');
 const backendCountryRouter = require('./routes/backend/country');
@@ -55,6 +56,7 @@ app.use(authController.getUserFromDatabaseBySessionUserId);
 // Routes prefix
 app.use('/', indexRouter);
 app.use('/catalog', categoryRouter);
+app.use('/product', productRouter);
 
 // Backend routes prefix
 // app.use('/backend', backendRouter);
@@ -66,7 +68,6 @@ app.use('/backend/product', backendProductRouter);
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {
-// вытягиваем его из базы данных и сохраняем в res.locals
   next(createError(404));
 });
 

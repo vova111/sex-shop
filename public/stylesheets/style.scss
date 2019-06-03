@@ -10,7 +10,7 @@ html {
 body {
   font-family: $main-font;
   height: 100%;
-  background: #fafafa;
+  background: #FFFFFF;
 }
 
 *, *:before, *:after {
@@ -39,8 +39,13 @@ body {
   filter: blur(5px);
 }
 
+section.page {
+  background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAVCAMAAACwjHQ2AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAABJQTFRF/////v7+/Pz8+vr6+/v7/f39KExYJgAAABpJREFUeNpiYGZgZmBhYAJDVgZGKMQCAAIMAANlABq6pr7+AAAAAElFTkSuQmCC") top left repeat-x;
+}
+
 @import "modules/header";
 @import "modules/breadcrumb";
 @import "modules/cell";
 @import "modules/filter";
 @import "pages/catalog";
+@import "pages/product";

@@ -132,6 +132,38 @@ categorySchema.statics.getMainCategoryCache = async function () {
     return mainMenu;
 };
 
+categorySchema.statics.generateBreadcrumb = function (start, category, product = null) {
+    const breadcrumb = [start];
+
+    if (category) {
+        if (category.parent) {
+            breadcrumb.push({url: `/${category.parent.slug}`, title: category.parent.name});
+        }
+
+        breadcrumb.push({url: `/${category.slug}`, title: category.name});
+    }
+
+    if (product) {
+        breadcrumb.push({url: null, title: product.name});
+    }
+
+    let url = '';
+    let html = '';
+
+    for (let i = 0; i < breadcrumb.length; i++) {
+        const isLast = ((breadcrumb.length - 1) === i);
+        url += breadcrumb[i].url;
+
+        if (!isLast) {
+            html += `<li><a href="${url}">${breadcrumb[i].title}</a></li>`;
+        } else {
+            html += `<li class="active">${breadcrumb[i].title}</li>`;
+        }
+    }
+
+    return html;
+};
+
 categorySchema.pre('save', function(next) {
     if (this.isNew) {
         this.wasNew = this.isNew;

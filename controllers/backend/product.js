@@ -2,6 +2,7 @@ const Product = require('models/product');
 const Country = require('models/country');
 const Brand = require('models/brand');
 const Category = require('models/category');
+const Color = require('models/color');
 const ProductJsonSchema = require('schemes/product');
 const Ajv = require('ajv/lib/ajv');
 const pagination = require('classes/boostrapPaginator');
@@ -42,6 +43,7 @@ const createView = async (req, res, next) => {
     const countries = await Country.find({}).sort({name: 1});
     const brands = await Brand.find({}).sort({name: 1});
     const categories = await Category.getTreeForMultiSelect();
+    const colors = await Color.find({}).sort({sort: 1});
 
     res.render('backend/product/create', {
         title: 'Создать новый товар',
@@ -49,6 +51,7 @@ const createView = async (req, res, next) => {
         countries: countries,
         brands: brands,
         categories: categories,
+        colors: colors,
         error: false
     });
 };
@@ -63,20 +66,22 @@ const createAction = async (req, res, next) => {
             throw new Error(message);
         }
 
-        const { name, code, category, slug, short, full } = req.body;
+        const { name, code, category, main, slug, short, full, colors } = req.body;
         const specificationNames = req.body.specification_name;
         const specificationValues = req.body.specification_value;
         const imagesThumb = req.body.image_thumb;
         const imagesFull = req.body.image_full;
         const imagesMain = req.body.image_main;
-        let { cost, discount, seller, brand, country, stock } = req.body;
+        let { cost, discount, seller, brand, country, stock, premium, only } = req.body;
 
         cost = Number(cost);
         discount = discount.length ? Number(discount) : null;
         seller = seller.length ? seller : null;
         brand = brand.length ? brand : null;
         country = country.length ? country : null;
-        stock = stock.length ? true : false;
+        stock = !!stock;
+        premium = !!premium;
+        only = !!only;
 
         const images = [];
 
@@ -105,10 +110,14 @@ const createAction = async (req, res, next) => {
             'description.full': full,
             specifications: Product.createSpecificationsObject(specificationNames, specificationValues),
             country: country,
+            mainCategory: main,
             brand: brand,
             seller: seller,
+            colors: colors,
             category: await Category.getCategoryWithParents(category),
-            photos: images
+            photos: images,
+            isPremium: premium,
+            isOnlyHere: only
         });
 
         await product.save();
@@ -141,6 +150,8 @@ const editView = async (req, res, next) => {
         const countries = await Country.find({}).sort({name: 1});
         const brands = await Brand.find({}).sort({name: 1});
         const categories = await Category.getTreeForMultiSelect(product.category);
+        const mainCategories = await Category.getTreeForMultiSelect([product.mainCategory.toString()]);
+        const colors = await Color.find({}).sort({sort: 1});
 
         res.render('backend/product/edit', {
             title: 'Редактирование товара',
@@ -148,6 +159,8 @@ const editView = async (req, res, next) => {
             countries: countries,
             brands: brands,
             categories: categories,
+            mainCategories: mainCategories,
+            colors: colors,
             error: false
         });
     } catch (error) {
@@ -169,20 +182,22 @@ const editAction = async (req, res, next) => {
 
         const product = await Product.findById(id);
 
-        const { name, code, category, slug, short, full } = req.body;
+        const { name, code, category, main, slug, short, full, colors } = req.body;
         const specificationNames = req.body.specification_name;
         const specificationValues = req.body.specification_value;
         const imagesThumb = req.body.image_thumb;
         const imagesFull = req.body.image_full;
         const imagesMain = req.body.image_main;
-        let { cost, discount, seller, brand, country, stock } = req.body;
+        let { cost, discount, seller, brand, country, stock, premium, only } = req.body;
 
         cost = Number(cost);
         discount = discount.length ? Number(discount) : null;
         seller = seller.length ? seller : null;
         brand = brand.length ? brand : null;
         country = country.length ? country : null;
-        stock = stock.length ? true : false;
+        stock = !!stock;
+        premium = !!premium;
+        only = !!only;
 
         if (imagesThumb) {
             const images = [];
@@ -219,16 +234,20 @@ const editAction = async (req, res, next) => {
         product.name = name;
         product.code = code;
         product.inStock = stock;
+        product.isPremium = premium;
+        product.isOnlyHere = only;
         product.slug = slug;
         product.cost.mainCost = cost;
         product.cost.discountCost = discount;
         product.description.short = short;
         product.description.full = full;
         product.specifications = Product.createSpecificationsObject(specificationNames, specificationValues);
+        product.colors = colors;
         product.country = country;
         product.brand = brand;
         product.seller = seller;
         product.category = await Category.getCategoryWithParents(category);
+        product.mainCategory = main;
 
         await product.save();
         await Category.updateProductCountCache();
@@ -240,7 +259,7 @@ const editAction = async (req, res, next) => {
         const countries = await Country.find({}).sort({name: 1});
         const brands = await Brand.find({}).sort({name: 1});
         const categories = await Category.getTreeForMultiSelect(req.body.category);
-        console.log(error.message);
+
         res.render('backend/product/edit', {
             title: 'Редактирование товара',
             data: req.body,
