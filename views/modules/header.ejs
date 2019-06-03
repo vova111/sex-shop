@@ -66,10 +66,14 @@
                     </a>
                 </div>
                 <div class="header-search">
-                    <form action="" method="post">
+                    <form action="/catalog" method="post">
                         <div class="header-search-container">
                             <div class="header-search-container-field">
-                                <input type="text" name="search" maxlength="200" placeholder="Поиск товаров">
+                                <% if (typeof searchText === 'undefined' || !searchText) { %>
+                                    <input type="text" name="search" value="" maxlength="200" placeholder="Поиск товаров">
+                                <% } else { %>
+                                    <input type="text" name="search" value="<%= searchText %>" maxlength="200" placeholder="Поиск товаров">
+                                <% } %>
                             </div>
                             <div class="header-search-container-button">
                                 <input type="image" src="/images/search.png" />

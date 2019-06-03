@@ -1,3 +1,5 @@
+let rangerObject;
+
 const disableAllFilters = (container) => {
     const filterBlocks = container.querySelectorAll('.filter-block');
 
@@ -24,79 +26,220 @@ const enableAllFilters = (container) => {
     }
 };
 
-const rebuildProductsList = (productsContainer, products) => {
+const rebuildProductsList = (productsContainer, showMoreButton, products) => {
     return new Promise((resolve, reject) => {
         const createCell = (product) => {
             const divCell = document.createElement('div');
-            const divCellImage = document.createElement('div');
-            const divCellPrice = document.createElement('div');
-            const divCellName = document.createElement('div');
-            const divCellTags = document.createElement('div');
 
             const createCategory = () => {
-                const divCellCategory = document.createElement('div');
-                const divCellCategoryName = document.createElement('div');
-                const divCellCategoryNameText = document.createTextNode(product.mainCategory.name);
+                const cellCategory = document.createElement('div');
+                const cellCategoryName = document.createElement('div');
+                const cellCategoryNameText = document.createTextNode(product.mainCategory.name);
                 const div = document.createElement('div');
                 const span = document.createElement('span');
 
                 span.classList.add('add-to-favorite');
                 span.dataset.item = product._id;
-                divCellCategoryName.classList.add('cell-category-name');
-                divCellCategory.classList.add('cell-category');
+                cellCategoryName.classList.add('cell-category-name');
+                cellCategory.classList.add('cell-category');
 
                 div.appendChild(span);
-                divCellCategoryName.appendChild(divCellCategoryNameText);
-                divCellCategory.appendChild(divCellCategoryName);
-                divCellCategory.appendChild(div);
-                // console.log(div);
-                return divCellCategory;
+                cellCategoryName.appendChild(cellCategoryNameText);
+                cellCategory.appendChild(cellCategoryName);
+                cellCategory.appendChild(div);
+
+                return cellCategory;
             };
-            console.log(createCategory());
+
+            const createImage = () => {
+                const cellImage = document.createElement('div');
+                const link = document.createElement('a');
+                const image = document.createElement('img');
+
+                const getMainImage = () => {
+                    for (let i = 0; i < product.photos.length; i++) {
+                        if (product.photos[i].isMain) {
+                            return product.photos[i].name;
+                        }
+                    }
+                };
+
+                image.src = `/uploads/products/thumbnails/${getMainImage()}`;
+                image.setAttribute('alt', product.name);
+                link.setAttribute('href', `/product/${product.slug}`);
+                cellImage.classList.add('cell-image');
+
+
+                link.appendChild(image);
+                cellImage.appendChild(link);
+
+                if (product.cost.isDiscount) {
+                    const discount = Math.round((product.cost.mainCost - product.cost.discountCost) / product.cost.mainCost * 100);
+                    const cellDiscount = document.createElement('div');
+                    const cellDiscountText = document.createTextNode(`-${discount}%`);
+
+                    cellDiscount.classList.add('cell-discount');
+                    cellDiscount.appendChild(cellDiscountText);
+                    cellImage.appendChild(cellDiscount);
+                }
+
+                return cellImage;
+            };
+
+            const createPrice = () => {
+                const cellPrice = document.createElement('div');
+                const cellPriceMain = document.createElement('div');
+
+                const getFormattedPrice = (price) => {
+                    if (price % 2 > 0) {
+                        return (price / 100).toFixed(2);
+                    }
+
+                    return price / 100;
+                };
+
+                const cellPriceMainText = document.createTextNode(`${getFormattedPrice(product.cost.currentCost)} грн.`);
+
+                cellPrice.classList.add('cell-price');
+                cellPriceMain.classList.add('cell-price-main');
+                cellPriceMain.appendChild(cellPriceMainText);
+
+                if (!product.cost.isDiscount) {
+                    cellPrice.appendChild(cellPriceMain);
+                } else {
+                    const cellPriceOld = document.createElement('div');
+                    const cellPriceOldText = document.createTextNode(`${getFormattedPrice(product.cost.mainCost)} грн.`);
+
+                    cellPriceOld.classList.add('cell-price-old');
+                    cellPriceMain.classList.add('discount');
+
+                    cellPriceOld.appendChild(cellPriceOldText);
+                    cellPrice.appendChild(cellPriceMain);
+                    cellPrice.appendChild(cellPriceOld);
+                }
+
+                return cellPrice;
+            };
+
+            const createName = () => {
+                const cellName = document.createElement('div');
+                const link = document.createElement('a');
+                const linkText = document.createTextNode(product.name);
+
+                link.setAttribute('href', `/product/${product.slug}`);
+                cellName.classList.add('cell-name');
+
+                link.appendChild(linkText);
+                cellName.appendChild(link);
+
+                return cellName;
+            };
+
+            const createTags = () => {
+                const cellTags = document.createElement('div');
+
+                cellTags.classList.add('cell-tags');
+
+                const createTag = (className, text) => {
+                    const span = document.createElement('span');
+                    const spanText = document.createTextNode(text);
+
+                    span.classList.add(className);
+                    span.appendChild(spanText);
+
+                    return span;
+                };
+
+                if (product.cost.isDiscount) {
+                    cellTags.appendChild(createTag('discount', 'скидка'));
+                }
+
+                if (product.isBestseller) {
+                    cellTags.appendChild(createTag('bestseller', 'хит продаж'));
+                }
+
+                if (product.isPremium) {
+                    cellTags.appendChild(createTag('premium', 'премиум'));
+                }
+
+                if (product.isOnlyHere) {
+                    cellTags.appendChild(createTag('only', 'только у нас'));
+                }
+
+                return cellTags;
+            };
+
+            divCell.classList.add('cell');
             divCell.appendChild(createCategory());
+            divCell.appendChild(createImage());
+            divCell.appendChild(createPrice());
+            divCell.appendChild(createName());
+            divCell.appendChild(createTags());
+
+            return divCell;
         };
 
         for (let i = 0; i < products.length; i++) {
-            createCell(products[i])
-            // productsContainer.appendChild(createCell(products[i]));
+            productsContainer.appendChild(createCell(products[i]));
+        }
+
+        if (products.length !== 12) {
+            showMoreButton.classList.add('show-more-hidden');
+        } else {
+            showMoreButton.classList.remove('show-more-hidden');
         }
     });
 };
 
-const rebuildFilters = (container, brands, countries) => {
+const rebuildFilters = (container, showMore, brands, countries, price, isPrice) => {
     return new Promise((resolve, reject) => {
-        const pasteCheckboxes = (selector, entities) => {
-            const content = container.querySelector(selector);
+        if (!showMore) {
+            const pasteCheckboxes = (selector, entities) => {
+                const content = container.querySelector(selector);
 
-            removeAllNodes(content);
+                removeAllNodes(content);
 
-            for (let entity of entities) {
-                const checkbox = document.createElement('div');
-                const checkboxText = document.createTextNode(entity.name);
+                for (let entity of entities) {
+                    const checkbox = document.createElement('div');
+                    const checkboxText = document.createTextNode(entity.name);
 
-                checkbox.classList.add('checkbox');
+                    checkbox.classList.add('checkbox');
 
-                if (typeof entity.selected !== 'undefined') {
-                    checkbox.classList.add('checked');
+                    if (typeof entity.selected !== 'undefined') {
+                        checkbox.classList.add('checked');
+                    }
+
+                    checkbox.dataset.item = entity.id;
+                    checkbox.appendChild(checkboxText);
+
+                    content.appendChild(checkbox);
                 }
+            };
 
-                checkbox.dataset.item = entity.id;
-                checkbox.appendChild(checkboxText);
+            pasteCheckboxes('.filter-brand .filter-block-content', brands);
+            pasteCheckboxes('.filter-country .filter-block-content', countries);
 
-                content.appendChild(checkbox);
+            if (!isPrice) {
+                rangerObject.update(price.min, price.max);
             }
-        };
-
-        pasteCheckboxes('.filter-brand .filter-block-content', brands);
-        pasteCheckboxes('.filter-country .filter-block-content', countries);
+        }
 
         enableAllFilters(container);
     });
 };
 
-const filterProducts = (container, productsContainer) => {
+const filterProducts = (container, productsContainer, showMoreButton, isPrice = false, showMore = false) => {
     disableAllFilters(container);
-    removeAllNodes(productsContainer);
+
+    let page = 1;
+
+    if (!showMore) {
+        removeAllNodes(productsContainer);
+        showMoreButton.dataset.page = '2';
+    } else {
+        page = Number(showMoreButton.dataset.page);
+        showMoreButton.dataset.page = String(page + 1);
+    }
 
     const collectCheckboxes = (selector, isCategory = false) => {
         const checkboxes = container.querySelectorAll(selector);
@@ -117,6 +260,17 @@ const filterProducts = (container, productsContainer) => {
         return collection;
     };
 
+    const collectTags = () => {
+        const tags = container.querySelectorAll('.filter-tags span.tag.active');
+        const array = [];
+
+        for (let tag of tags) {
+            array.push(tag.dataset.item);
+        }
+
+        return array;
+    };
+
     const getPrice = (selector) => {
         const field = container.querySelector(selector);
         const limit = parseInt(field.dataset.limit);
@@ -130,9 +284,16 @@ const filterProducts = (container, productsContainer) => {
         return sort.dataset.item;
     };
 
+    const getSearchText = () => {
+        const input = container.querySelector('.filter-search input[name="search"]');
+        return input.value;
+    };
+
     const categories = collectCheckboxes('.filter-category .checkbox', true);
     const brands = collectCheckboxes('.filter-brand .checkbox');
     const countries = collectCheckboxes('.filter-country .checkbox');
+    const tags = collectTags();
+    const search = getSearchText();
 
     const price = {
         min: getPrice('.filter-price input[name="range-min"]'),
@@ -140,15 +301,14 @@ const filterProducts = (container, productsContainer) => {
     };
 
     const sort = getSort();
-    const page = 1;
 
     axios.post('/catalog/filter', {
-            categories, brands, countries, price, sort, page
+            categories, tags, brands, countries, search, price, isPrice, sort, page
         })
         .then((response) => {
             return Promise.all([
-                rebuildFilters(container, response.data.brands, response.data.countries),
-                rebuildProductsList(productsContainer, response.data.products)
+                rebuildFilters(container, showMore, response.data.brands, response.data.countries, response.data.price, response.data.isPrice),
+                rebuildProductsList(productsContainer, showMoreButton, response.data.products)
             ]);
         })
         .catch((error) => {
@@ -162,6 +322,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const finterCatalogContainer = filterContainer.querySelector('.side');
     const filterBlocks = document.querySelector('.filter-blocks');
     const productsContainer = document.querySelector('.list-products-container');
+    const sortContainer = document.querySelector('.list-caption-container-sort');
+    const showMoreButton = document.querySelector('a.show-more');
 
     filterBlocks.addEventListener('click', (event) => {
         const target = event.target;
@@ -186,7 +348,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 target.classList.remove('checked');
             }
 
-            filterProducts(filterContainer, productsContainer);
+            filterProducts(filterContainer, productsContainer, showMoreButton);
+        }
+
+        if (target.classList.contains('tag')) {
+            if (target.classList.contains('active')) {
+                target.classList.remove('active');
+            } else {
+                target.classList.add('active');
+            }
+
+            filterProducts(filterContainer, productsContainer, showMoreButton);
         }
     });
 
@@ -203,6 +375,23 @@ document.addEventListener('DOMContentLoaded', () => {
     finterCatalogContainer.addEventListener('mouseleave', () => {
         enableAllFilters(filterContainer);
         finterCatalogContainer.classList.add('side-hidden');
+    });
+
+    sortContainer.addEventListener('click', (event) => {
+        const target = event.target;
+
+        if (target.classList.contains('sort')) {
+            const active = sortContainer.querySelector('a.active');
+
+            active.classList.remove('active');
+            target.classList.add('active');
+
+            filterProducts(filterContainer, productsContainer, showMoreButton, true);
+        }
+    });
+
+    showMoreButton.addEventListener('click', () => {
+        filterProducts(filterContainer, productsContainer, showMoreButton, false,true);
     });
 
     const Ranger = function (containerName, minElement, maxElement, step) {
@@ -223,6 +412,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 slideMin.style.left = '0';
                 slideMax.style.left = `${this.maxLeft}px`;
                 this.fill();
+            },
+            reInit: function (min, max) {
+
             },
             sync : function () {
                 /* set min */
@@ -326,7 +518,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         slideMin.addEventListener("mouseup", function(e){
             range.minDragged = false;
-            filterProducts(filterContainer, productsContainer);
+            filterProducts(filterContainer, productsContainer, showMoreButton, true);
         });
 
         /* set Max slide Listener */
@@ -336,7 +528,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         slideMax.addEventListener("mouseup", function(e){
             range.maxDragged = false;
-            filterProducts(filterContainer, productsContainer);
+            filterProducts(filterContainer, productsContainer, showMoreButton, true);
         });
 
         /* default unset */
@@ -349,7 +541,21 @@ document.addEventListener('DOMContentLoaded', () => {
         document.addEventListener("mousemove", function(e){
             range.slideDrag(e);
         });
+
+        this.update = function (min, max) {
+            minElement.value = `${min}${currency}`;
+            minElement.dataset.limit = min;
+            maxElement.value = `${max}${currency}`;
+            maxElement.dataset.limit = max;
+
+            range.min = min;
+            range.max = max;
+            range.maxLeft = sliderRanger.offsetWidth;
+            range.width = sliderRanger.offsetWidth / (range.max - range.min);
+            range.step = (!isNaN(parseInt(step)) && parseInt(step) > 0)?parseInt(step):range.step;
+            range.init();
+        };
     };
 
-    new Ranger('.ranger', 'input[name="range-min"]', 'input[name="range-max"]');
+    rangerObject = new Ranger('.ranger', 'input[name="range-min"]', 'input[name="range-max"]');
 });

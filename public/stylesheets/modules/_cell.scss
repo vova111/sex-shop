@@ -1,9 +1,7 @@
 .cell {
-  flex-basis: 200px;
   border: 1px solid #E9E9E9;
   padding: 25px 23px 25px 24px;
   background-color: #ffffff;
-  flex-grow: 1;
   min-width: 0;
   &-category {
     display: flex;
@@ -87,7 +85,6 @@
   &-tags {
     span {
       display: inline-block;
-      cursor: pointer;
       font-size: 12px;
       line-height: 15px;
       text-align: center;

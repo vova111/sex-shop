@@ -214,6 +214,10 @@ productSchema.statics.getFormattedPrice = function(price) {
     return price / 100;
 };
 
+productSchema.statics.getConvertedPrice = function(price) {
+    return price * 100;
+};
+
 productSchema.methods.getPrice = function() {
     return Product.getFormattedPrice(this.cost.currentCost);
 };

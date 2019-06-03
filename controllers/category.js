@@ -8,6 +8,7 @@ const showCategory = async (req, res, next) => {
     let parent;
     let subCategory;
     let whereCategory;
+    const search = req.body.search !== undefined ? req.body.search : '';
     const slug = req.params.slug;
     const breadcrumbStart = {url: '/catalog', title: title};
     const limit = 12;
@@ -41,7 +42,14 @@ const showCategory = async (req, res, next) => {
         });
     }
 
-    const products = await Product.find({ category: { $in: whereCategory } })
+    const where = { category: { $in: whereCategory }, inStock: true };
+
+    if (search) {
+        title = `Поиск: ${search}`;
+        where['name'] = { '$regex': search, '$options': 'i' };
+    }
+
+    const products = await Product.find(where)
         .select('id cost name mainCategory slug photos isBestseller isPremium isOnlyHere')
         .populate('mainCategory', 'name')
         .sort({ rating: -1 })
@@ -55,15 +63,16 @@ const showCategory = async (req, res, next) => {
         category: category,
         parent: parent,
         subCategory: subCategory,
-        maxPrice: await getMaxPrice(whereCategory),
+        price: await getMinAndMaxPrice(whereCategory),
         brands: await getBrands(whereCategory),
         countries: await getCountry(whereCategory),
-        products: products
+        products: products,
+        searchText: search
     });
 };
 
 const filterProducts = async (req, res, next) => {
-    const { categories, brands, countries, price, sort, page } = req.body;
+    const { categories, tags, brands, countries, search, price, isPrice, sort, page } = req.body;
 
     const convertToObjectId = (array) => {
         const objects = [];
@@ -92,6 +101,7 @@ const filterProducts = async (req, res, next) => {
     const newCountries = await getCountry(objectsOfCategories, countries);
     const selectedBrands = getSelected(newBrands);
     const selectedCountries = getSelected(newCountries);
+    const newPrice = await getMinAndMaxPrice(objectsOfCategories);
 
     const where = { category: { $in: objectsOfCategories }, inStock: true };
 
@@ -107,12 +117,39 @@ const filterProducts = async (req, res, next) => {
         where['country'] = { $in: objectsOfCountries };
     }
 
-    if (price.min) {
-        where['cost.currentCost'] = { $gte: price.min }
+    if (price.min && price.max) {
+        where['cost.currentCost'] = {
+            $gte: Product.getConvertedPrice(price.min),
+            $lte: Product.getConvertedPrice(price.max)
+        };
+    } else {
+        if (price.min) {
+            where['cost.currentCost'] = { $gte: Product.getConvertedPrice(price.min) };
+        }
+
+        if (price.max) {
+            where['cost.currentCost'] = { $lte: Product.getConvertedPrice(price.max) };
+        }
     }
 
-    if (price.max) {
-        where['cost.currentCost'] = { $lte: price.max }
+    if (tags.indexOf('discount') !== -1) {
+        where['cost.isDiscount'] = true;
+    }
+
+    if (tags.indexOf('bestseller') !== -1) {
+        where['isBestseller'] = true;
+    }
+
+    if (tags.indexOf('premium') !== -1) {
+        where['isPremium'] = true;
+    }
+
+    if (tags.indexOf('only') !== -1) {
+        where['isOnlyHere'] = true;
+    }
+
+    if (search) {
+        where['name'] = { '$regex': search, '$options': 'i' };
     }
 
     let order;
@@ -145,10 +182,10 @@ const filterProducts = async (req, res, next) => {
         .limit(limit)
         .lean();
 
-    res.json({ products, brands: newBrands, countries: newCountries, page });
+    res.json({ products, brands: newBrands, countries: newCountries, price: newPrice, isPrice, page });
 };
 
-const getMaxPrice = async (category) => {
+const getMinAndMaxPrice = async (category) => {
     const aggregatorOpts = [{
         $match: {
             category: { $in: category }
@@ -156,13 +193,22 @@ const getMaxPrice = async (category) => {
     }, {
         $group: {
             _id: null,
+            min: { $min: "$cost.currentCost" },
             max: { $max: "$cost.currentCost" }
         }
     }];
 
     const result = await Product.aggregate(aggregatorOpts);
 
-    return result.length ? Math.ceil(Product.getFormattedPrice(result[0].max)) : 0;
+    let min = 0;
+    let max = 0;
+
+    if (result.length) {
+        min = Math.floor(Product.getFormattedPrice(result[0].min));
+        max = Math.ceil(Product.getFormattedPrice(result[0].max));
+    }
+
+    return { min: min, max: max};
 };
 
 const getBrands = async (category, selected = []) => {

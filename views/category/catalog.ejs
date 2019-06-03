@@ -84,11 +84,11 @@
                                 <div class="filter-block-content">
                                     <div class="filter-block-content-inputs">
                                         <div class="ranger-input">
-                                            <input type="text" value="0 грн." data-limit="0" name="range-min" inputmode="numeric" maxlength="8">
+                                            <input type="text" value="<%= price.min %> грн." data-limit="<%= price.min %>" name="range-min" inputmode="numeric" maxlength="8">
                                         </div>
                                         <div class="ranger-separator"><span></span></div>
                                         <div class="ranger-input">
-                                            <input type="text" value="<%= maxPrice %> грн." data-limit="<%= maxPrice %>" name="range-max" inputmode="numeric" maxlength="8">
+                                            <input type="text" value="<%= price.max %> грн." data-limit="<%= price.max %>" name="range-max" inputmode="numeric" maxlength="8">
                                         </div>
                                     </div>
                                     <div class="filter-block-content-ranger">
@@ -103,11 +103,11 @@
                                 </div>
                                 <div class="filter-block-content">
                                     <div class="filter-tags-container">
-                                        <span class="discount">скидка</span>
-                                        <span class="bestseller">хит продаж</span>
-                                        <span class="new">новинка</span>
-                                        <span class="premium">премиум</span>
-                                        <span class="only">только у нас</span>
+                                        <span class="tag discount" data-item="discount">скидка</span>
+                                        <span class="tag bestseller" data-item="bestseller">хит продаж</span>
+                                        <span class="tag new" data-item="new">новинка</span>
+                                        <span class="tag premium" data-item="premium">премиум</span>
+                                        <span class="tag only" data-item="only">только у нас</span>
                                     </div>
                                 </div>
                             </div>
@@ -141,6 +141,9 @@
                                     <% }); %>
                                 </div>
                             </div>
+                            <div class="filter-search">
+                                <input type="hidden" name="search" value="<%= searchText %>">
+                            </div>
                         </div>
                     </div>
                     <div class="list">
@@ -151,10 +154,10 @@
                             <div class="list-caption-container-sort">
                                 <ul>
                                     <li>Сортировать по:</li>
-                                    <li><a href="javascript:;" data-item="rating" class="active">Рейтингу</a></li>
-                                    <li><a href="javascript:;" data-item="new">Новые</a></li>
-                                    <li><a href="javascript:;" data-item="cheap">Дешевые</a></li>
-                                    <li><a href="javascript:;" data-item="expensive">Дорогие</a></li>
+                                    <li><a href="javascript:;" data-item="rating" class="sort active">Рейтингу</a></li>
+                                    <li><a href="javascript:;" data-item="new" class="sort">Новые</a></li>
+                                    <li><a href="javascript:;" data-item="cheap"  class="sort">Дешевые</a></li>
+                                    <li><a href="javascript:;" data-item="expensive" class="sort">Дорогие</a></li>
                                 </ul>
                             </div>
                         </div>
@@ -200,6 +203,13 @@
                                     </div>
                                 </div>
                             <% }); %>
+                        </div>
+                        <div class="show-more-container">
+                            <% if (products.length == 12) { %>
+                                <a href="javascript:;" class="show-more" data-page="2">Показать еще +</a>
+                            <% } else { %>
+                                <a href="javascript:;" class="show-more show-more-hidden" data-page="2">Показать еще +</a>
+                            <% } %>
                         </div>
                     </div>
                 </div>

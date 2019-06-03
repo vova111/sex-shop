@@ -170,7 +170,7 @@
           background-color: #FFA555;
         }
         &.bestseller {
-          background: linear-gradient(0deg, #7359BE, #7359BE), #EB5757;
+          background-color: #7359BE
         }
         &.new {
           background-color: #2D9CDB;
@@ -180,6 +180,9 @@
         }
         &.only {
           background-color: #7278FF;
+        }
+        &.active {
+          background-color: #ff5555;
         }
       }
     }

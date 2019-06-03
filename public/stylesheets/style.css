@@ -693,11 +693,9 @@ section.page {
     color: #333333; }
 
 .cell {
-  flex-basis: 200px;
   border: 1px solid #E9E9E9;
   padding: 25px 23px 25px 24px;
   background-color: #ffffff;
-  flex-grow: 1;
   min-width: 0; }
   .cell-category {
     display: flex;
@@ -767,7 +765,6 @@ section.page {
       text-decoration: none; }
   .cell-tags span {
     display: inline-block;
-    cursor: pointer;
     font-size: 12px;
     line-height: 15px;
     text-align: center;
@@ -925,13 +922,15 @@ section.page {
       .filter-tags-container span.discount {
         background-color: #FFA555; }
       .filter-tags-container span.bestseller {
-        background: linear-gradient(0deg, #7359BE, #7359BE), #EB5757; }
+        background-color: #7359BE; }
       .filter-tags-container span.new {
         background-color: #2D9CDB; }
       .filter-tags-container span.premium {
         background-color: #E787FF; }
       .filter-tags-container span.only {
         background-color: #7278FF; }
+      .filter-tags-container span.active {
+        background-color: #ff5555; }
   .filter-country {
     border-bottom: none; }
   .filter-block-name {
@@ -1067,11 +1066,29 @@ section.page {
   .list-products-container {
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-between;
-    align-items: stretch; }
+    align-items: stretch;
+    margin-top: -0.8%; }
     .list-products-container > div {
-      flex: 0 0 32.3%;
-      margin-bottom: 13px; }
+      width: 32.2%;
+      margin: 0.8%; }
+      .list-products-container > div:nth-of-type(3n) {
+        margin-right: 0; }
+      .list-products-container > div:nth-of-type(3n+1) {
+        margin-left: 0; }
+  .list .show-more-container {
+    margin-top: 0.8%; }
+    .list .show-more-container a.show-more {
+      display: inline-block;
+      width: 100%;
+      line-height: 21px;
+      text-align: center;
+      border: 1.5px solid #7359BE;
+      color: #7359BE;
+      text-decoration: none;
+      font-weight: bold;
+      padding: 12px 0; }
+      .list .show-more-container a.show-more.show-more-hidden {
+        display: none; }
 
 .showcase {
   display: flex; }
