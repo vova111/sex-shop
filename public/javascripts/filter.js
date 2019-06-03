@@ -214,14 +214,16 @@ const rebuildFilters = (container, showMore, brands, countries, price, isPrice) 
 
                     content.appendChild(checkbox);
                 }
+
+                if (!isPrice) {
+                    rangerObject.update(price.min, price.max);
+                }
             };
 
             pasteCheckboxes('.filter-brand .filter-block-content', brands);
             pasteCheckboxes('.filter-country .filter-block-content', countries);
 
-            if (!isPrice) {
-                rangerObject.update(price.min, price.max);
-            }
+
         }
 
         enableAllFilters(container);
